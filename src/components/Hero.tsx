@@ -1,4 +1,3 @@
-import Tomoe from "@/components/Tomoe"
 import RotatingImage from "./RotatingImage"
 
 export default function Hero() {
