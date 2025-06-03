@@ -74,3 +74,23 @@ body {
     }
   }
 }
+
+@keyframes vortex {
+  0% {
+    transform: rotate(0deg) scale(1);
+    filter: blur(0px);
+  }
+  50% {
+    transform: rotate(3deg) scale(1.03);
+    filter: blur(2px);
+  }
+  100% {
+    transform: rotate(0deg) scale(1);
+    filter: blur(0px);
+  }
+}
+
+.vortex-hover:hover {
+  animation: vortex 0.4s ease-in-out;
+}
+
