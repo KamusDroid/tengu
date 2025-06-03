@@ -1,26 +1,76 @@
-@import "tailwindcss";
+  @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Comportamiento de scroll suave en toda la página */
+html {
+  scroll-behavior: smooth;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Estilos base del body */
+body {
+  background-color: rgb(245, 214, 214);
+  color: #411404;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Estilo para dark mode (NextThemes lo gestiona con la clase `dark`) */
+.dark body {
+  background-color: #110200; 
+  color: rgb(105, 3, 3);
+}
+
+/* Selección de texto */
+::selection {
+  background-color: #720f0f; 
+  color: rgb(180, 109, 109);
+}
+
+/* Utilidad personalizada: fade-in */
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  .text-glow-red {
+    text-shadow: 0 0 4px #492121, 0 0 8px #3b1111;
+  }
+  .text-neon {
+    text-shadow:
+      0 0 5px #f43f5e,       /* rosa vibrante */
+      0 0 10px #f43f5e,
+      0 0 20px #f43f5e,
+      0 0 40px #e11d48,
+      0 0 80px #be123c;
+  }
+
+  .text-neon-hover:hover {
+    text-shadow:
+      0 0 5px #f43f5e,
+      0 0 10px #f43f5e,
+      0 0 20px #f43f5e,
+      0 0 40px #e11d48,
+      0 0 80px #be123c;
+  }
+  .animate-spin-slow {
+    animation: spin 3s linear infinite;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
 }
