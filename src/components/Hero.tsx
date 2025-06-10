@@ -1,3 +1,5 @@
+"use client";
+
 import RotatingImage from "./RotatingImage"
 
 export default function Hero() {
@@ -11,12 +13,18 @@ export default function Hero() {
       <p className="text-lg md:text-xl text-zinc-400 mb-6 max-w-xl">
         Donde las ideas digitales cobran vida.
       </p>
-      <a
-        href="#contacto"
-        className="bg-red-800 text-white px-6 py-3 rounded-full hover:bg-red-900 transition"
-      >
-        Contáctanos
-      </a>
+      <div className="flex flex-col sm:flex-row items-center gap-4 mb-6 z-20">
+
+        <a
+          href="https://chat.whatsapp.com/FK8uIDZ1m0Z2pLq81I5ODd"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="bg-red-800 text-white px-6 py-3 rounded-full hover:bg-red-900 transition"
+        >
+          Contáctanos
+        </a>
+
+      </div>
       <RotatingImage />
 
       
