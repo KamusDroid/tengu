@@ -3,7 +3,7 @@ const proyectos = [
     nombre: 'TENGU Web',
     descripcion: 'Landing institucional en Next.js 15 + Tailwind 4.',
     stack: 'Next.js, Tailwind CSS',
-    url: "https://www.tengu-dev.vercel.app"
+    url: "https://www.tengu.com.ar"
   },
   {
     nombre: 'API Tasks',
@@ -16,6 +16,12 @@ const proyectos = [
     descripcion: 'Mini app de chat con IA personalizada.',
     stack: 'Python, LangChain, React',
     url: "#"
+  },
+    {
+    nombre: 'Cucinarte Web',
+    descripcion: 'Landing Institucional.',
+    stack: 'Next.js, Tailwind CSS',
+    url: "https://www.cucinarte.com.ar"
   },
 ]
 
