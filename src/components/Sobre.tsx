@@ -34,7 +34,7 @@ una visión para preservar la vida y el conocimiento mediante IA y tecnología a
         <span className="text-red-800 font-semibold">
           Mi misión es crear soluciones de impacto que ayuden a personas, emprendedores y empresas a transformar sus ideas en realidades funcionales, con una base tecnológica sólida, visión estratégica y un trato cercano y humano.
 
-          ¿Por qué "Tengu"?
+          ¿Por qué &quot;Tengu&quot;?
         El nombre Tengu representa la mezcla entre lo místico y lo técnico. Así como el Tengu en la mitología japonesa domina los cielos y el arte de la espada, en mi trabajo combino conocimiento, precisión y visión para ayudarte a llevar tu negocio o proyecto al siguiente nivel.
         </span>
 
