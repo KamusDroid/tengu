@@ -7,12 +7,10 @@ export default function Home() {
   return (
     <>
       <main className="flex flex-col gap-16">
-       
-        <div id="hero"><Hero /></div>
-        <div id="servicios"><Servicios /></div>
-        <div id="proyectos"><Proyectos /></div>
-        <div id="sobre"><Sobre /></div>
-        
+        <Hero />
+        <Servicios />
+        <Proyectos />
+        <Sobre />
       </main>
     </>
   )

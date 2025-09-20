@@ -1,44 +1,42 @@
-import { Code2, Brain, MousePointerClick } from 'lucide-react'
+import Link from "next/link"
+import { Brain, Code2, MousePointerClick } from "lucide-react"
 
-const servicios = [
-  {
-    icon: Code2,
-    titulo: 'Desarrollo Web',
-    descripcion: 'Creamos sitios rápidos, modernos y optimizados.',
-    url: '#',
-  },
-  {
-    icon: Brain,
-    titulo: 'IA Aplicada',
-    descripcion: 'Integramos inteligencia artificial en soluciones prácticas.',
-    url: '#',
-  },
-  {
-    icon: MousePointerClick,
-    titulo: 'UX Gamificada',
-    descripcion: 'Diseños interactivos y experiencias memorables.',
-    url: '#',
-  },
-]
+import { services } from "@/lib/content"
+
+const iconLibrary = {
+  Brain,
+  Code2,
+  MousePointerClick
+}
 
 export default function Servicios() {
   return (
-    <section className="py-20 px-4 max-w-6xl mx-auto">
-      <h2 className="text-3xl font-bold text-center mb-12">Servicios</h2>
+    <section id="servicios" aria-labelledby="servicios-title" className="mx-auto max-w-6xl px-4 py-20">
+      <div className="text-center">
+        <h2 id="servicios-title" className="mb-12 text-3xl font-bold">
+          Servicios
+        </h2>
+      </div>
       <div className="grid gap-8 md:grid-cols-3">
-        {servicios.map(({ icon: Icon, titulo, descripcion, url }, i) => (
-          <a
-            key={i}
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bg-[#615353] p-6 rounded-xl border border-[#796363] transition-transform hover:scale-105 hover:shadow-lg block text-center vortex-hover"
-          >
-            <Icon className="h-10 w-10 mx-auto text-red-800 mb-4" />
-            <h3 className="text-xl font-semibold mb-2">{titulo}</h3>
-            <p className="text-zinc-400">{descripcion}</p>
-          </a>
-        ))}
+        {services.map(({ icon, titulo, descripcion, url }) => {
+          const Icon = iconLibrary[icon as keyof typeof iconLibrary]
+          const isExternal = url.startsWith("http")
+
+          return (
+            <Link
+              key={titulo}
+              href={url}
+              target={isExternal ? "_blank" : undefined}
+              rel={isExternal ? "noopener noreferrer" : undefined}
+              prefetch={isExternal ? false : undefined}
+              className="vortex-hover block rounded-xl border border-[#796363] bg-[#615353] p-6 text-center transition-transform hover:scale-105 hover:shadow-lg"
+            >
+              {Icon && <Icon aria-hidden className="mx-auto mb-4 h-10 w-10 text-red-800" />}
+              <h3 className="mb-2 text-xl font-semibold">{titulo}</h3>
+              <p className="text-zinc-200">{descripcion}</p>
+            </Link>
+          )
+        })}
       </div>
     </section>
   )

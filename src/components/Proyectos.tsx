@@ -1,48 +1,38 @@
-const proyectos = [
-  {
-    nombre: 'TENGU Web',
-    descripcion: 'Landing institucional en Next.js 15 + Tailwind 4.',
-    stack: 'Next.js, Tailwind CSS',
-    url: "https://www.tengu.com.ar"
-  },
-  {
-    nombre: 'API Tasks',
-    descripcion: 'API REST para tareas usando FastAPI.',
-    stack: 'FastAPI, SQLModel',
-    url: "#"
-  },
-  {
-    nombre: 'Demo IA Chat',
-    descripcion: 'Mini app de chat con IA personalizada.',
-    stack: 'Python, LangChain, React',
-    url: "#"
-  },
-    {
-    nombre: 'Cucinarte Web',
-    descripcion: 'Landing Institucional.',
-    stack: 'Next.js, Tailwind CSS',
-    url: "https://www.cucinarte.com.ar"
-  },
-]
+import Link from "next/link"
+
+import { projects } from "@/lib/content"
 
 export default function Proyectos() {
   return (
-    <section className="py-20 px-4 max-w-6xl mx-auto">
-      <h2 className="text-3xl font-bold text-center mb-12">Proyectos</h2>
+    <section
+      id="proyectos"
+      aria-labelledby="proyectos-title"
+      className="mx-auto max-w-6xl px-4 py-20"
+    >
+      <div className="text-center">
+        <h2 id="proyectos-title" className="mb-12 text-3xl font-bold">
+          Proyectos
+        </h2>
+      </div>
       <div className="grid gap-8 md:grid-cols-3">
-        {proyectos.map((p, i) => (
-          <a
-            key={i}
-            href={p.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bg-[#615353] p-6 rounded-xl border border-[#796363] transition-transform hover:scale-105 hover:shadow-lg block vortex-hover"
-          >
-            <h3 className="text-xl font-semibold mb-1">{p.nombre}</h3>
-            <p className="text-sm text-zinc-400 mb-2">{p.descripcion}</p>
-            <p className="text-xs text-zinc-500">Stack: {p.stack}</p>
-          </a>
-        ))}
+        {projects.map((project) => {
+          const isExternal = project.url.startsWith("http")
+
+          return (
+            <Link
+              key={project.nombre}
+              href={project.url}
+              target={isExternal ? "_blank" : undefined}
+              rel={isExternal ? "noopener noreferrer" : undefined}
+              prefetch={isExternal ? false : undefined}
+              className="vortex-hover block rounded-xl border border-[#796363] bg-[#615353] p-6 transition-transform hover:scale-105 hover:shadow-lg"
+            >
+              <h3 className="mb-1 text-xl font-semibold">{project.nombre}</h3>
+              <p className="mb-2 text-sm text-zinc-200">{project.descripcion}</p>
+              <p className="text-xs text-zinc-300">Stack: {project.stack}</p>
+            </Link>
+          )
+        })}
       </div>
     </section>
   )

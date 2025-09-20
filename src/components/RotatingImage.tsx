@@ -1,13 +1,33 @@
 "use client"
 
-export default function RotatingImage() {
+import clsx from "clsx"
+import Image from "next/image"
+
+type RotatingImageProps = {
+  className?: string
+}
+
+export default function RotatingImage({ className }: RotatingImageProps) {
   return (
-    <div className="absolute w-full h-full z-0 animate-spin-slow">
-      <img
-        src="/tomoe.png"
-        alt="Tomoe central"
-        className="w-full h-full object-contain rounded-full opacity-11"
-      />
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center"
+    >
+      <div
+        className={clsx(
+          "clip-circle relative aspect-square w-full max-w-[44rem] pointer-events-auto",
+          className
+        )}
+      >
+        <Image
+          src="/tomoe.png"
+          alt="Emblema Tomoe girando"
+          fill
+          priority
+          sizes="(max-width: 767px) 80vw, 44rem"
+          className="pointer-events-none rounded-full object-contain opacity-10"
+        />
+      </div>
     </div>
   )
 }

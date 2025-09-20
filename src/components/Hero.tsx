@@ -1,35 +1,39 @@
-"use client";
+"use client"
 
+import Link from "next/link"
+
+import { heroContent } from "@/lib/content"
 import RotatingImage from "./RotatingImage"
 
 export default function Hero() {
+  const { id, title, description, cta } = heroContent
+
   return (
-    <section className="min-h-[80vh] flex flex-col items-center justify-center text-center px-4">
-           
-      
-      <h1 className="text-5xl md:text-7xl lg:text-9xl font-bold mb-4">
-        TENGU
-      </h1>
-      <p className="text-lg md:text-xl text-zinc-400 mb-6 max-w-xl">
-        Donde las ideas digitales cobran vida.
-      </p>
-      <div className="flex flex-col sm:flex-row items-center gap-4 mb-6 z-20">
-
-        <a
-          href="https://chat.whatsapp.com/FK8uIDZ1m0Z2pLq81I5ODd"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="bg-red-800 text-white px-6 py-3 rounded-full hover:bg-red-900 transition"
-        >
-          Contáctanos
-        </a>
-
+    <section
+      id={id}
+      aria-labelledby={`${id}-title`}
+      className="min-h-[80vh] px-4"
+    >
+      <div className="relative flex min-h-[80vh] flex-col items-center justify-center text-center">
+        <div className="pointer-events-none relative z-10 flex flex-col items-center gap-6">
+          <h1 id={`${id}-title`} className="text-5xl font-bold md:text-7xl lg:text-9xl">
+            {title}
+          </h1>
+          <p className="max-w-xl text-lg text-zinc-400 md:text-xl">{description}</p>
+          <div className="z-20 flex flex-col items-center gap-4 sm:flex-row">
+            <Link
+              href={cta.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              prefetch={false}
+              className="pointer-events-auto rounded-full bg-red-800 px-6 py-3 text-white transition hover:bg-red-900"
+            >
+              {cta.label}
+            </Link>
+          </div>
+        </div>
+        <RotatingImage className="spin-hover-desktop" />
       </div>
-      <RotatingImage />
-
-      
- 
     </section>
-    
   )
 }

@@ -69,6 +69,25 @@ body {
     animation: spin 3s linear infinite;
   }
 
+  .spin-hover-desktop {
+    animation: spin 3s linear infinite;
+  }
+
+  .clip-circle {
+    clip-path: circle(50%);
+  }
+
+  @media (hover: hover) and (min-width: 768px) {
+    .spin-hover-desktop {
+      animation: none;
+      cursor: pointer;
+    }
+
+    .spin-hover-desktop:hover {
+      animation: spin 3s linear infinite;
+    }
+  }
+
   @keyframes spin {
     0% {
       transform: rotate(0deg);
