@@ -38,3 +38,14 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 =======
 # tengu
 >>>>>>> 94fdac8096d651b3609953b8c976936b179b1d1d
+
+
+## Marketplace + Auth + Stripe + Sheets + Email (añadido)
+Configurar `.env` (ver `.env.example`) y luego:
+```
+npm install
+npm run prisma:generate
+npm run prisma:migrate
+npm run dev
+```
+Rutas: `/register`, `/login`, `/marketplace`, `/api/products`, `/api/checkout`.

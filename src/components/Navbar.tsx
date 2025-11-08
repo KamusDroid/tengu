@@ -29,6 +29,15 @@ export default function Navbar() {
                 {link.label}
               </Link>
             ))}
+
+            {/* ⬇️ Agregado: Ingresar (mismo estilo y forma que el resto) */}
+            <Link
+              href="/login"
+              className="text-sm text-red-600 transition-all duration-300 text-neon-hover"
+              onClick={() => setOpen(false)}
+            >
+              Ingresar
+            </Link>
           </div>
 
           <ThemeToggle />
@@ -58,6 +67,17 @@ export default function Navbar() {
               </Link>
             </li>
           ))}
+
+          {/* ⬇️ Agregado en mobile: Ingresar */}
+          <li>
+            <Link
+              href="/login"
+              className="block rounded px-4 py-2 transition-colors hover:bg-red-600 dark:hover:bg-zinc-800"
+              onClick={() => setOpen(false)}
+            >
+              Ingresar
+            </Link>
+          </li>
         </ul>
       )}
     </nav>

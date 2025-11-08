@@ -27,11 +27,11 @@ export type AboutContent = {
 }
 
 export const navigationLinks: NavLink[] = [
-  { href: "#hero", label: "Inicio" },
-  { href: "#servicios", label: "Servicios" },
-  { href: "#proyectos", label: "Proyectos" },
-  { href: "#sobre", label: "Sobre" },
-  { href: "#contacto", label: "Contacto" }
+  { href: "/#hero", label: "Inicio" },
+  { href: "/#servicios", label: "Servicios" },
+  { href: "/#proyectos", label: "Proyectos" },
+  { href: "/#sobre", label: "Sobre" },
+  { href: "/#contacto", label: "Contacto" }
 ]
 
 export const heroContent = {
