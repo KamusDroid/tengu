@@ -12,14 +12,14 @@ html {
 /* Estilos base del body */
 body {
   background-color: rgb(245, 214, 214);
-  color: #411404;
+  color: #5c1c05;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Estilo para dark mode (NextThemes lo gestiona con la clase `dark`) */
 .dark body {
-  background-color: #110200; 
-  color: rgb(105, 3, 3);
+  background-color: #390801; 
+  color: rgb(171, 6, 6);
 }
 
 /* Selección de texto */

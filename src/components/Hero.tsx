@@ -19,7 +19,7 @@ export default function Hero() {
           <h1 id={`${id}-title`} className="text-5xl font-bold md:text-7xl lg:text-9xl">
             {title}
           </h1>
-          <p className="max-w-xl text-lg text-zinc-400 md:text-xl">{description}</p>
+          <p className="max-w-xl text-lg text-black dark:text-zinc-400 md:text-xl">{description}</p>
           <div className="z-20 flex flex-col items-center gap-4 sm:flex-row">
             <Link
               href={cta.href}

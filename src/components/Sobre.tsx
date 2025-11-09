@@ -12,12 +12,12 @@ export default function Sobre() {
       <h2 id="sobre-title" className="mb-6 text-3xl font-bold">
         {heading}
       </h2>
-      <div className="space-y-5 text-lg leading-relaxed text-zinc-200">
+      <div className="space-y-5 text-lg leading-relaxed text-black dark:text-zinc-200">
         {paragraphs.map((paragraph) => (
           <p key={paragraph}>{paragraph}</p>
         ))}
         <p className="text-lg font-semibold text-red-400">{highlight}</p>
-        <p className="text-base font-medium text-rose-200">{supportNote}</p>
+        <p className="text-base font-medium text-black dark:text-rose-200">{supportNote}</p>
       </div>
     </section>
   )
