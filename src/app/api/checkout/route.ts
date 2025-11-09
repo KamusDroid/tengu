@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
-import { prisma } from '@/lib/db'
+import { shopDb } from '@/lib/dbShop'
 import { getUserFromCookie } from '@/lib/auth'
 import { appendOrderRow } from '@/lib/sheets'
 
@@ -38,7 +38,7 @@ export async function POST(req: Request) {
 
     const currency = items[0].currency || 'usd'
 
-    // Creamos los datos comunes de items
+    // Datos para los items
     const itemsData = {
       create: items.map((item) => ({
         productId: item.id,
@@ -48,14 +48,13 @@ export async function POST(req: Request) {
       })),
     }
 
-    const order = await prisma.order.create({
+    const order = await shopDb.order.create({
       data: {
         totalCents,
         currency,
         status: 'pending',
-        user: {
-          connect: { id: user.userId },
-        },
+        // ahora guardamos solo el userId (string), no relación directa
+        userId: user.userId,
         items: itemsData,
       },
     })

@@ -4,11 +4,15 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-  "build": "prisma db push && prisma generate && next build",
+    "build": "prisma db push --schema=prisma/auth.prisma && prisma db push --schema=prisma/shop.prisma && prisma db push --schema=prisma/crm.prisma && prisma generate --schema=prisma/auth.prisma && prisma generate --schema=prisma/shop.prisma && prisma generate --schema=prisma/crm.prisma && next build",
     "start": "next start",
     "lint": "next lint",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev --name init",
+    "prisma:dbpush:auth": "prisma db push --schema=prisma/auth.prisma",
+    "prisma:dbpush:shop": "prisma db push --schema=prisma/shop.prisma",
+    "prisma:dbpush:crm": "prisma db push --schema=prisma/crm.prisma",
+    "prisma:generate:auth": "prisma generate --schema=prisma/auth.prisma",
+    "prisma:generate:shop": "prisma generate --schema=prisma/shop.prisma",
+    "prisma:generate:crm": "prisma generate --schema=prisma/crm.prisma",
     "prisma:studio": "prisma studio"
   },
   "dependencies": {

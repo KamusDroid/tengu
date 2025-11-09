@@ -27,9 +27,9 @@ export default function Proyectos() {
               prefetch={isExternal ? false : undefined}
               className="vortex-hover block rounded-xl border border-[#796363] bg-[#615353] p-6 transition-transform hover:scale-105 hover:shadow-lg"
             >
-              <h3 className="mb-1 text-xl font-semibold">{project.nombre}</h3>
-              <p className="mb-2 text-sm text-zinc-200">{project.descripcion}</p>
-              <p className="text-xs text-zinc-300">Stack: {project.stack}</p>
+              <h3 className="mb-1 text-xl font-semibold  text-red-800">{project.nombre}</h3>
+              <p className="mb-2 text-md font-semibold text-gray-400">{project.descripcion}</p>
+              <p className="text-sm text-gray-400">Stack: {project.stack}</p>
             </Link>
           )
         })}

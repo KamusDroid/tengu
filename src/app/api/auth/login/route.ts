@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
+import { authDb } from '@/lib/dbAuth'
 import { z } from 'zod'
 import bcrypt from 'bcryptjs'
 import { signToken, setAuthCookie } from '@/lib/auth'
@@ -12,16 +12,25 @@ const schema = z.object({
 export async function POST(req: Request) {
   const body = await req.json()
   const { email, password } = schema.parse(body)
-  const user = await prisma.user.findUnique({ where: { email } })
-  if (!user) return new NextResponse('Credenciales inválidas', { status: 401 })
+
+  const user = await authDb.user.findUnique({ where: { email } })
+  if (!user) {
+    return new NextResponse('Credenciales inválidas', { status: 401 })
+  }
+
   const ok = await bcrypt.compare(password, user.password)
-  if (!ok) return new NextResponse('Credenciales inválidas', { status: 401 })
+  if (!ok) {
+    return new NextResponse('Credenciales inválidas', { status: 401 })
+  }
+
   const token = signToken({ userId: user.id, email })
+
   const res = NextResponse.json({
     id: user.id,
     email: user.email,
     name: user.name,
   })
+
   setAuthCookie(res.cookies, token)
   return res
 }

@@ -15,7 +15,7 @@ export default function Hero() {
       className="min-h-[80vh] px-4"
     >
       <div className="relative flex min-h-[80vh] flex-col items-center justify-center text-center">
-        <div className="pointer-events-none relative z-10 flex flex-col items-center gap-6">
+        <div className="pointer-events-none relative flex flex-col items-center gap-6">
           <h1 id={`${id}-title`} className="text-5xl font-bold md:text-7xl lg:text-9xl">
             {title}
           </h1>

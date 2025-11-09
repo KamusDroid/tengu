@@ -32,8 +32,8 @@ export default function Servicios() {
               className="vortex-hover block rounded-xl border border-[#796363] bg-[#615353] p-6 text-center transition-transform hover:scale-105 hover:shadow-lg"
             >
               {Icon && <Icon aria-hidden className="mx-auto mb-4 h-10 w-10 text-red-800" />}
-              <h3 className="mb-2 text-xl font-semibold">{titulo}</h3>
-              <p className="text-zinc-200">{descripcion}</p>
+              <h3 className="mb-2 text-xl font-semibold  text-red-800">{titulo}</h3>
+              <p className="font-semibold text-gray-400">{descripcion}</p>
             </Link>
           )
         })}

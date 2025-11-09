@@ -1,0 +1,20 @@
+// prisma/crm.prisma
+datasource db {
+  provider = "postgresql"
+  url      = env("CRM_DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/crm"
+}
+
+model Customer {
+  id        String   @id @default(uuid())
+  userId    String?  // opcional: id de User en AUTH
+  fullName  String
+  email     String
+  phone     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

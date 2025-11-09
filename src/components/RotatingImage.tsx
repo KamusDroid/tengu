@@ -25,7 +25,7 @@ export default function RotatingImage({ className }: RotatingImageProps) {
           fill
           priority
           sizes="(max-width: 767px) 80vw, 44rem"
-          className="pointer-events-none rounded-full object-contain opacity-30"
+          className="pointer-events-none rounded-full object-contain opacity-10"
         />
       </div>
     </div>

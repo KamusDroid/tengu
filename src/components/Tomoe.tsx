@@ -12,7 +12,7 @@ export default function Tomoe() {
   if (!isMounted) return null
 
   return (
-    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 z-0 pointer-events-none opacity-50">
+    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 z-0 pointer-events-none opacity-30">
       <div className="relative w-full h-full animate-spin-slow">
         {[0, 120, 240].map((angle, idx) => (
           <div

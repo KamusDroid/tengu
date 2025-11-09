@@ -1,0 +1,48 @@
+// prisma/shop.prisma
+datasource db {
+  provider = "postgresql"
+  url      = env("SHOP_DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/shop"
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  imageUrl    String?
+  priceCents  Int
+  currency    String   @default("usd")
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  orderItems  OrderItem[]
+}
+
+model Order {
+  id         String      @id @default(uuid())
+  userId     String      // referencia al id de User en la DB AUTH (luego lo manejamos por app)
+  totalCents Int
+  currency   String      @default("usd")
+  status     String      @default("pending")
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  items      OrderItem[]
+}
+
+model OrderItem {
+  id         String   @id @default(uuid())
+  order      Order    @relation(fields: [orderId], references: [id])
+  orderId    String
+  product    Product  @relation(fields: [productId], references: [id])
+  productId  String
+  quantity   Int
+  priceCents Int
+  currency   String   @default("usd")
+  createdAt  DateTime @default(now())
+}

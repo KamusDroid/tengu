@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
+import { authDb } from '@/lib/dbAuth'
 import { z } from 'zod'
 import bcrypt from 'bcryptjs'
 import { signToken, setAuthCookie } from '@/lib/auth'
@@ -15,7 +15,7 @@ export async function POST(req: Request) {
     const body = await req.json()
     const { email, password, name } = schema.parse(body)
 
-    const exists = await prisma.user.findUnique({
+    const exists = await authDb.user.findUnique({
       where: { email },
     })
 
@@ -27,7 +27,7 @@ export async function POST(req: Request) {
 
     const hashed = await bcrypt.hash(password, 10)
 
-    const user = await prisma.user.create({
+    const user = await authDb.user.create({
       data: {
         email,
         password: hashed,
@@ -46,6 +46,7 @@ export async function POST(req: Request) {
       email: user.email,
       name: user.name,
     })
+
     setAuthCookie(response.cookies, token)
     return response
   } catch (err) {
