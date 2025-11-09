@@ -1,62 +1,84 @@
 import { NextResponse } from 'next/server'
-import Stripe from 'stripe'
+import { z } from 'zod'
 import { prisma } from '@/lib/db'
-import { appendOrderRow } from '@/lib/sheets'
 import { getUserFromCookie } from '@/lib/auth'
+import { appendOrderRow } from '@/lib/sheets'
+
+const itemSchema = z.object({
+  id: z.string(), // id del producto
+  quantity: z.number().int().min(1),
+  priceCents: z.number().int(),
+  currency: z.string(),
+})
+
+const schema = z.object({
+  items: z.array(itemSchema),
+})
 
 export async function POST(req: Request) {
-  const body = await req.json()
-  const items = body.items as { id:string, name:string, priceCents:number, currency:string, quantity:number }[]
-  if (!items?.length) return new NextResponse('No hay items', { status: 400 })
-
-  const user = getUserFromCookie()
-  if (!user) return new NextResponse('No autenticado', { status: 401 })
-
-  const totalCents = items.reduce((s,i)=> s + i.priceCents * i.quantity, 0)
-
-  const order = await prisma.order.create({
-    data: {
-      userId: user.sub,
-      totalCents,
-      currency: items[0].currency || 'usd',
-      status: 'pending',
-      items: {
-        create: items.map(i => ({
-          productId: i.id,
-          quantity: i.quantity,
-          priceCents: i.priceCents,
-          currency: i.currency || 'usd',
-        }))
-      }
-    },
-    include: { items: true }
-  })
-
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, { apiVersion: '2024-06-20' })
-  const session = await stripe.checkout.sessions.create({
-    mode: 'payment',
-    line_items: items.map(i => ({
-      price_data: {
-        currency: i.currency || 'usd',
-        product_data: { name: i.name },
-        unit_amount: i.priceCents,
-      },
-      quantity: i.quantity,
-    })),
-    success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/marketplace?status=success`,
-    cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/marketplace?status=cancel`,
-    metadata: { orderId: order.id, userId: user.sub },
-  })
-
-  await prisma.order.update({ where: { id: order.id }, data: { stripeId: session.id } })
-
   try {
-    await appendOrderRow([
-      new Date().toISOString(), order.id, user.email || '', totalCents/100, order.currency, 'created'
-    ])
-  } catch (e) {
-    console.error('Sheets append error', e)
-  }
+    const body = await req.json()
+    const { items } = schema.parse(body)
 
-  return NextResponse.json({ url: session.url })
+    if (!items.length) {
+      return new NextResponse('No hay items en el carrito', { status: 400 })
+    }
+
+    const user = await getUserFromCookie()
+    if (!user?.userId) {
+      return new NextResponse('Debes iniciar sesión para comprar', {
+        status: 401,
+      })
+    }
+
+    const totalCents = items.reduce(
+      (sum, item) => sum + item.priceCents * item.quantity,
+      0
+    )
+
+    const currency = items[0].currency || 'usd'
+
+    // Creamos los datos comunes de items
+    const itemsData = {
+      create: items.map((item) => ({
+        productId: item.id,
+        quantity: item.quantity,
+        priceCents: item.priceCents,
+        currency: item.currency,
+      })),
+    }
+
+    const order = await prisma.order.create({
+      data: {
+        totalCents,
+        currency,
+        status: 'pending',
+        user: {
+          connect: { id: user.userId },
+        },
+        items: itemsData,
+      },
+    })
+
+    // Opcional: log a Google Sheets si está configurado
+    try {
+      if (process.env.GOOGLE_SHEETS_SPREADSHEET_ID) {
+        await appendOrderRow([
+          order.id,
+          user?.email ?? 'anon',
+          new Date().toISOString(),
+          totalCents,
+          currency,
+          JSON.stringify(items),
+        ])
+      }
+    } catch (err) {
+      console.error('Error al escribir en Google Sheets', err)
+    }
+
+    return NextResponse.json({ id: order.id })
+  } catch (err) {
+    console.error(err)
+    return new NextResponse('Error en checkout', { status: 500 })
+  }
 }
