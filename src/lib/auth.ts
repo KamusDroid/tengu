@@ -19,6 +19,9 @@ export interface AuthTokenPayload {
   name?: string
 }
 
+// Este es el tipo que vamos a usar en el resto de la app
+export type AuthUser = AuthTokenPayload & JwtPayload
+
 // Crear un token JWT
 export function signToken(
   payload: AuthTokenPayload,
@@ -31,8 +34,8 @@ export function signToken(
 }
 
 // Verificar un token y devolver el payload tipado
-export function verifyToken(token: string): AuthTokenPayload & JwtPayload {
-  return jwt.verify(token, getJwtSecret()) as AuthTokenPayload & JwtPayload
+export function verifyToken(token: string): AuthUser {
+  return jwt.verify(token, getJwtSecret()) as AuthUser
 }
 
 // Guardar el token en cookie httpOnly
@@ -50,8 +53,7 @@ export function setAuthCookie(
 }
 
 // Leer el usuario desde la cookie (o null si no hay / token inválido)
-export async function getUserFromCookie():
-  Promise<(AuthTokenPayload & JwtPayload) | null> {
+export async function getUserFromCookie(): Promise<AuthUser | null> {
   const cookieStore = await cookies()
   const token = cookieStore.get(COOKIE_NAME)?.value
   if (!token) return null
@@ -66,4 +68,18 @@ export async function getUserFromCookie():
 // Borrar cookie
 export function clearAuthCookie(cookieStore: ResponseCookies): void {
   cookieStore.delete(COOKIE_NAME)
+}
+
+// === NUEVO: helper para saber si es admin ===
+
+export function isAdmin(user: AuthUser | null | undefined): boolean {
+  const raw = process.env.ADMIN_EMAILS
+  if (!user || !raw) return false
+
+  const allowed = raw
+    .split(',')
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean)
+
+  return allowed.includes(user.email.toLowerCase())
 }
