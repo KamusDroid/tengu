@@ -1,12 +1,10 @@
 "use client"
 
-import Link from "next/link"
-
 import { heroContent } from "@/lib/content"
 import RotatingImage from "./RotatingImage"
 
 export default function Hero() {
-  const { id, title, description, cta } = heroContent
+  const { id, title, description } = heroContent
 
   return (
     <section

@@ -123,9 +123,14 @@ export function AdminProductsManager({ initialProducts }: Props) {
       }
 
       resetForm()
-    } catch (err: any) {
-      setError(err.message ?? 'Error al guardar el producto')
-    } finally {
+        } catch (err) {
+        if (err instanceof Error) {
+        setError(err.message)
+        } else {
+        setError('Error al guardar el producto')
+        }
+        } finally {
+  
       setLoading(false)
     }
   }
@@ -146,9 +151,14 @@ export function AdminProductsManager({ initialProducts }: Props) {
 
       setProducts((prev) => prev.filter((p) => p.id !== id))
       if (editingId === id) resetForm()
-    } catch (err: any) {
-      setError(err.message ?? 'Error al eliminar el producto')
-    } finally {
+      } catch (err) {
+    if (err instanceof Error) {
+      setError(err.message)
+    } else {
+      setError('Error al eliminar el producto')
+    }
+  } finally {
+
       setLoading(false)
     }
   }
@@ -171,9 +181,14 @@ export function AdminProductsManager({ initialProducts }: Props) {
 
       setItems([])
       alert('Pedido realizado correctamente')
-    } catch (err: any) {
-      setError(err.message ?? 'Error en el checkout')
-    } finally {
+      } catch (err) {
+    if (err instanceof Error) {
+      setError(err.message)
+    } else {
+      setError('Error en el checkout')
+    }
+  } finally {
+
       setLoading(false)
     }
   }
