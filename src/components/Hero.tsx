@@ -25,7 +25,7 @@ export default function Hero() {
       </video>
 
       {/* CAPA OSCURA PARA QUE SE LEA EL TEXTO */}
-      <div className="absolute inset-0 bg-black/30" />
+      <div className="absolute inset-0 bg-red-200/10 dark:bg-black/30" />
 
       <div className="relative flex min-h-[80vh] flex-col items-center justify-center text-center">
         <RotatingImage className="spin-hover-desktop" />
@@ -34,7 +34,7 @@ export default function Hero() {
           <h1 id={`${id}-title`} className="text-5xl font-bold md:text-7xl lg:text-9xl">
             {title}
           </h1>
-          <p className="max-w-xl text-lg text-black dark:text-zinc-400 md:text-xl">{description}</p>
+          <p className="max-w-xl text-lg text-zinc-400 md:text-xl">{description}</p>
           
         </div>
       </div>

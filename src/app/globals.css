@@ -12,7 +12,7 @@ html {
 /* Estilos base del body */
 body {
   background-color: rgb(245, 214, 214);
-  color: #5c1c05;
+  color:rgb(171, 6, 6);
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
