@@ -29,7 +29,7 @@ export default function ProductCard({ product, onAdd }: Props) {
       <h3 className="font-semibold">{product.name}</h3>
 
       {product.description && (
-        <p className="text-sm opacity-80">{product.description}</p>
+        <p className="text-md opacity-90">{product.description}</p>
       )}
 
       <p className="font-mono">
