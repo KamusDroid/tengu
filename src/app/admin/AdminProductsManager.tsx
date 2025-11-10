@@ -165,8 +165,8 @@ export function AdminProductsManager({ initialProducts }: Props) {
 
   async function checkout() {
     if (!items.length) return
-    setLoading(true)
     setError(null)
+    setLoading(true)
 
     try {
       const res = await fetch('/api/checkout', {
@@ -179,16 +179,21 @@ export function AdminProductsManager({ initialProducts }: Props) {
         throw new Error(await res.text())
       }
 
-      setItems([])
-      alert('Pedido realizado correctamente')
-      } catch (err) {
-    if (err instanceof Error) {
-      setError(err.message)
-    } else {
-      setError('Error en el checkout')
-    }
-  } finally {
+      const data = (await res.json()) as {
+        id: string
+        mpInitPoint?: string | null
+      }
 
+      if (data.mpInitPoint) {
+        window.location.href = data.mpInitPoint
+      } else {
+        setItems([])
+        alert('Pedido registrado, pero no se pudo abrir el checkout de pago.')
+      }
+    } catch (err) {
+      console.error(err)
+      setError('Error en el checkout')
+    } finally {
       setLoading(false)
     }
   }

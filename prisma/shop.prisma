@@ -24,15 +24,21 @@ model Product {
 }
 
 model Order {
-  id         String      @id @default(uuid())
-  userId     String      // referencia al id de User en la DB AUTH (luego lo manejamos por app)
-  totalCents Int
-  currency   String      @default("usd")
-  status     String      @default("pending")
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
+  id             String      @id @default(uuid())
+  userId         String
+  totalCents     Int
+  currency       String      @default("usd")
+  status         String      @default("pending") // pending, paid, failed
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
 
-  items      OrderItem[]
+  // Mercado Pago
+  mpPreferenceId String?
+  mpPaymentId    String?
+  mpStatus       String?
+  mpStatusDetail String?
+
+  items          OrderItem[]
 }
 
 model OrderItem {
@@ -41,8 +47,7 @@ model OrderItem {
   orderId    String
   product    Product  @relation(fields: [productId], references: [id])
   productId  String
-  quantity   Int
+  quantity   Int      @default(1)
   priceCents Int
   currency   String   @default("usd")
-  createdAt  DateTime @default(now())
 }

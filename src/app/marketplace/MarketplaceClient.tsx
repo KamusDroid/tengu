@@ -30,7 +30,7 @@ export default function MarketplaceClient() {
     loadProducts()
   }, [])
 
-  async function checkout() {
+    async function checkout() {
     if (!items.length) return
     setError(null)
 
@@ -45,8 +45,19 @@ export default function MarketplaceClient() {
         throw new Error(await res.text())
       }
 
-      setItems([])
-      alert('Pedido realizado correctamente')
+      const data = (await res.json()) as {
+        id: string
+        mpInitPoint?: string | null
+      }
+
+      if (data.mpInitPoint) {
+        // Redirigimos al checkout de Mercado Pago
+        window.location.href = data.mpInitPoint
+      } else {
+        // Fallback: solo limpiamos carrito
+        setItems([])
+        alert('Pedido registrado, pero no se pudo abrir el checkout de pago.')
+      }
     } catch (err) {
       console.error(err)
       setError('Error al procesar el pedido')
