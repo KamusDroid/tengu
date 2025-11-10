@@ -50,4 +50,6 @@ model OrderItem {
   quantity   Int      @default(1)
   priceCents Int
   currency   String   @default("usd")
+  createdAt  DateTime @default(now())
 }
+
