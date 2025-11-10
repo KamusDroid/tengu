@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
-import { prisma } from '@/lib/db'
+import { shopDb } from '@/lib/dbShop'
 import { getUserFromCookie, isAdmin } from '@/lib/auth'
 
 const baseProductSchema = z.object({
@@ -22,9 +22,9 @@ const updateSchema = baseProductSchema.extend({
   id: z.string(),
 })
 
-// GET → público (para marketplace)
+// GET → público (marketplace), productos activos
 export async function GET() {
-  const products = await prisma.product.findMany({
+  const products = await shopDb.product.findMany({
     where: { active: true },
     orderBy: { createdAt: 'desc' },
   })
@@ -42,7 +42,7 @@ export async function POST(req: Request) {
   const body = await req.json()
   const data = createSchema.parse(body)
 
-  const product = await prisma.product.create({
+  const product = await shopDb.product.create({
     data: {
       name: data.name,
       description: data.description,
@@ -66,7 +66,7 @@ export async function PUT(req: Request) {
   const body = await req.json()
   const data = updateSchema.parse(body)
 
-  const product = await prisma.product.update({
+  const product = await shopDb.product.update({
     where: { id: data.id },
     data: {
       name: data.name,
@@ -95,7 +95,7 @@ export async function DELETE(req: Request) {
     return new NextResponse('Falta id', { status: 400 })
   }
 
-  await prisma.product.delete({ where: { id } })
+  await shopDb.product.delete({ where: { id } })
 
   return new NextResponse(null, { status: 204 })
 }
