@@ -85,22 +85,24 @@ export const projects: ProjectItem[] = [
     url: "#"
   },
   {
-    nombre: "Cucinarte Web",
-    descripcion: "Landing institucional para la marca Cucinarte.",
-    stack: "Next.js, Tailwind CSS",
-    url: "https://www.cucinarte.com.ar"
+    nombre: "Eco Nails So Cute",
+    descripcion: "Landing web + Marketplace para la marca Eco Nails So Cute",
+    stack: "WordPress, WooCommerce",
+    url: "https://www.econailssocute.com.ar"
   }
 ]
 
 export const aboutContent: AboutContent = {
   heading: "¿Quién está detrás de TENGU?",
   paragraphs: [
-    "¡Hola! Soy Walter Matías Amengual, el creador de Tengu.com.ar. Soy un profesional apasionado por la tecnología, la ciencia de datos y el desarrollo de soluciones innovadoras.",
-    "Mi enfoque combina experiencia técnica, pensamiento estratégico y una fuerte vocación por resolver problemas reales mediante datos, automatización y diseño inteligente.",
-    "En Tengu desarrollo e implemento proyectos de data science, ingeniería de datos, analítica de negocios, desarrollo web, automatización y marketing digital.",
-    "Trabajo con tecnologías modernas como Python, JavaScript, SQL, Docker, Kubernetes, Spark, Pandas y más, mientras continúo formándome en cloud computing, ciberseguridad y robótica en el marco del proyecto Gaia OMNIA.",
-    "¿Por qué 'Tengu'? El nombre representa la mezcla entre lo místico y lo técnico. Así como en la mitología japonesa domina los cielos y el arte de la espada, aquí combinamos conocimiento, precisión y visión para llevar los proyectos al siguiente nivel."
+    "Soy Walter Matías Amengual, fundador de Tengu.com.ar. Ingeniero de soluciones con foco en desarrollo de software, inteligencia artificial y automatización de procesos — construyendo sistemas que trabajan por vos.",
+    "Tengu existe para cerrar la brecha entre la idea y la ejecución. Empresas, PyMEs y startups que necesitan escalar sin sumar complejidad encuentran en Tengu un socio técnico y estratégico real, no solo un proveedor.",
+    "Desarrollamos software multiplataforma a medida, integramos IA generativa en flujos de trabajo existentes, automatizamos procesos operativos y construimos herramientas de gestión que dan visibilidad y control total sobre el negocio.",
+    "También acompañamos organizaciones en su transformación digital: desde la auditoría y diagnóstico de procesos hasta la consultoría estratégica en tecnología y Data & Analytics — con foco en decisiones que mueven la aguja.",
+    "Nuestro stack combina React / Next.js, FastAPI / Django, Python, SQL y Docker en el frontend y backend; Kubernetes, Spark y cloud AWS / GCP / Azure para infraestructura escalable; y LangChain, OpenAI y Anthropic para soluciones de IA generativa y agentes inteligentes.",
+    "¿Por qué 'Tengu'? En la mitología japonesa, el Tengu domina el cielo con precisión y maestría. Cada proyecto que tomamos tiene ese mismo estándar: ejecución impecable, visión de largo plazo."
   ],
-  highlight: "Mi misión es crear soluciones de impacto que transformen ideas en realidades funcionales, con tecnología sólida, visión estratégica y un trato cercano.",
-  supportNote: "Me respalda un equipo de especialistas en marketing, ventas y diseño gráfico."
-}
+  highlight: "No vendemos horas. Construimos sistemas y acompañamos decisiones. Tecnología robusta, criterio estratégico y resultados medibles para empresas que quieren operar en otro nivel.",
+  supportNote: "Respaldado por un equipo de especialistas en marketing, ventas y diseño gráfico."
+};
+
