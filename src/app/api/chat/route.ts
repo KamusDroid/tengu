@@ -16,7 +16,8 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     const { messages } = BodySchema.parse(body)
 
-    const reply = await chatWithGroq(messages)
+    const limitedMessages = messages.slice(-10)
+    const reply = await chatWithGroq(limitedMessages)
 
     return NextResponse.json({ reply })
   } catch (err) {
