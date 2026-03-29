@@ -3,6 +3,7 @@ import { Nova_Square } from "next/font/google"
 import Navbar from "@/components/Navbar"
 import Footer from "@/components/Footer"
 import { ThemeProvider } from "@/components/ThemeProvider"
+import TenguChat from "@/components/TenguChat"
 
 const novaSquare = Nova_Square({
   subsets: ["latin"],
@@ -29,8 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Navbar />
           <main className="w-screen min-h-screen px-4 py-8">{children}</main>
           <Footer />
-
-          
+          <TenguChat />
         </ThemeProvider>
       </body>
     </html>
