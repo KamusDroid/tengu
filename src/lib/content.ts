@@ -84,6 +84,12 @@ export const projects: ProjectItem[] = [
     stack: "Python, LangChain, React",
     url: "#"
   },
+    {
+    nombre: "FungicaLAB",
+    descripcion: "Landing web + Marketplace para la marca Eco Nails So Cute",
+    stack: "Next.JS, Tailwind CSS, Mercado Pago, Supabase, Emailing",
+    url: "https://www.fungicalab.com.ar"
+  },
   {
     nombre: "Eco Nails So Cute",
     descripcion: "Landing web + Marketplace para la marca Eco Nails So Cute",

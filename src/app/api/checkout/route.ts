@@ -176,8 +176,3 @@ export async function POST(req: Request) {
     return new NextResponse('Error en checkout', { status: 500 })
   }
 }
-
-// Evita 405 en preflight
-export async function OPTIONS() {
-  return NextResponse.json({}, { status: 200 })
-}

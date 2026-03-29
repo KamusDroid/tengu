@@ -123,16 +123,15 @@ export function AdminProductsManager({ initialProducts }: Props) {
       }
 
       resetForm()
-        } catch (err) {
-        if (err instanceof Error) {
-        setError(err.message)
-        } else {
-        setError('Error al guardar el producto')
-        }
-        } finally {
-  
-      setLoading(false)
+  } catch (err) {
+    if (err instanceof Error) {
+      setError(err.message)
+    } else {
+      setError('Error al guardar el producto')
     }
+  } finally {
+    setLoading(false)
+  }
   }
 
   async function handleDelete(id: string) {
@@ -151,16 +150,15 @@ export function AdminProductsManager({ initialProducts }: Props) {
 
       setProducts((prev) => prev.filter((p) => p.id !== id))
       if (editingId === id) resetForm()
-      } catch (err) {
+  } catch (err) {
     if (err instanceof Error) {
       setError(err.message)
     } else {
       setError('Error al eliminar el producto')
     }
   } finally {
-
-      setLoading(false)
-    }
+    setLoading(false)
+  }
   }
 
   async function checkout() {

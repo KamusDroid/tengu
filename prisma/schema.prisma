@@ -1,3 +1,11 @@
+// ATENCIÓN: Este schema NO se usa en producción.
+// La app utiliza tres schemas separados:
+//   - prisma/auth.prisma   → AUTH_DATABASE_URL
+//   - prisma/shop.prisma   → SHOP_DATABASE_URL
+//   - prisma/crm.prisma    → CRM_DATABASE_URL
+//
+// Este archivo existe solo como referencia de estructura unificada.
+
 generator client {
   provider = "prisma-client-js"
 }
