@@ -86,7 +86,7 @@ export const projects: ProjectItem[] = [
   },
     {
     nombre: "FungicaLAB",
-    descripcion: "Pagina Web + Tienda + Panel de Administración y Analítica para FungicaLAB, laboratorio de análisis de hongos y suelos. Incluye Agente AI para asistencia de compras y consultas, integración con Mercado Pago.",
+    descripcion: "Pagina Web + Tienda + Panel de Administración y Analítica para FungicaLAB. Incluye Agente AI para asistencia de compras y consultas, integración con Mercado Pago.",
     stack: "Next.JS, Tailwind CSS, Agente AI Chat, Mercado Pago, Supabase, Emailing",
     url: "https://www.fungicalab.com.ar"
   },
