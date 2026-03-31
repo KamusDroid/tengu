@@ -90,7 +90,7 @@ export async function POST(req: Request) {
 
     const order = await shopDb.order.update({
       where: { id: orderId },
-      include: { items: true },
+      include: { items: { include: { product: true } } },
       data: {
         mpPaymentId: String(paymentData.id),
         mpStatus,
@@ -101,11 +101,17 @@ export async function POST(req: Request) {
 
     // Si el pago fue aprobado, enviamos las notificaciones por correo
     if (internalStatus === 'paid') {
+      const emailItems = order.items.map((item: any) => ({
+        name: item.product.name,
+        quantity: item.quantity,
+        price: item.priceCents / 100,
+      }));
+
       await sendOrderConfirmationToCustomer({
         to: order.customerEmail,
         customerName: order.customerName,
         orderId: order.id,
-        items: order.items as any,
+        items: emailItems,
         total: order.total,
       });
 
@@ -113,7 +119,7 @@ export async function POST(req: Request) {
         to: order.customerEmail,
         customerName: order.customerName,
         orderId: order.id,
-        items: order.items as any,
+        items: emailItems,
         total: order.total,
       });
     }

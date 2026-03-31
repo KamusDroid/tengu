@@ -14,6 +14,8 @@ type DbProduct = {
 type DbOrderItem = {
   productId: string
   quantity: number
+  priceCents: number
+  currency: string
 }
 
 const itemSchema = z.object({
@@ -68,10 +70,10 @@ export async function POST(req: Request) {
     }
 
     // 2) Calcular total y preparar items de la orden
-    let totalAmount = 0
+    let totalCents = 0
     const orderItemsData = items.map((i) => {
       const p = getProductById(i.id)
-      totalAmount += (p.priceCents / 100) * i.quantity
+      totalCents += p.priceCents * i.quantity
       return {
         productId: p.id,
         quantity: i.quantity,
@@ -87,7 +89,8 @@ export async function POST(req: Request) {
         userId: user.userId,
         customerEmail: user.email,
         customerName: user.name ?? 'Cliente',
-        total: totalAmount,
+        total: totalCents / 100,
+        totalCents,
         currency,
         status: 'pending',
         items: { create: orderItemsData },
@@ -155,7 +158,7 @@ export async function POST(req: Request) {
           order.id,
           user.email,
           new Date().toISOString(),
-          totalAmount,
+          totalCents / 100,
           currency,
           JSON.stringify(orderItemsData),
         ])
