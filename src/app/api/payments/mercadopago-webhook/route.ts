@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server'
 import { shopDb } from '@/lib/dbShop'
+import {
+  sendOrderConfirmationToCustomer,
+  sendNewOrderNotificationToAdmin,
+} from "@/lib/mail";
 
 function getMpAccessToken(): string {
   const token = process.env.MP_ACCESS_TOKEN
@@ -84,8 +88,9 @@ export async function POST(req: Request) {
       internalStatus = 'failed'
     }
 
-    await shopDb.order.update({
+    const order = await shopDb.order.update({
       where: { id: orderId },
+      include: { items: true },
       data: {
         mpPaymentId: String(paymentData.id),
         mpStatus,
@@ -93,6 +98,25 @@ export async function POST(req: Request) {
         status: internalStatus,
       },
     })
+
+    // Si el pago fue aprobado, enviamos las notificaciones por correo
+    if (internalStatus === 'paid') {
+      await sendOrderConfirmationToCustomer({
+        to: order.customerEmail,
+        customerName: order.customerName,
+        orderId: order.id,
+        items: order.items as any,
+        total: order.total,
+      });
+
+      await sendNewOrderNotificationToAdmin({
+        to: order.customerEmail,
+        customerName: order.customerName,
+        orderId: order.id,
+        items: order.items as any,
+        total: order.total,
+      });
+    }
 
     return NextResponse.json({ ok: true })
   } catch {

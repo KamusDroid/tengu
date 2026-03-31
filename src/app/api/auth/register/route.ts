@@ -3,6 +3,7 @@ import { authDb } from '@/lib/dbAuth'
 import { z } from 'zod'
 import bcrypt from 'bcryptjs'
 import { signToken, setAuthCookie } from '@/lib/auth'
+import { sendWelcomeEmail, sendNewUserAlertToAdmin } from "@/lib/mail";
 
 const schema = z.object({
   email: z.string().email(),
@@ -46,6 +47,10 @@ export async function POST(req: Request) {
       email: user.email,
       name: user.name,
     })
+
+    // Enviar correos de bienvenida tras el registro exitoso
+    await sendWelcomeEmail({ to: email, name });
+    await sendNewUserAlertToAdmin({ to: email, name });
 
     setAuthCookie(response.cookies, token)
     return response

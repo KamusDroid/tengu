@@ -68,10 +68,10 @@ export async function POST(req: Request) {
     }
 
     // 2) Calcular total y preparar items de la orden
-    let totalCents = 0
+    let totalAmount = 0
     const orderItemsData = items.map((i) => {
       const p = getProductById(i.id)
-      totalCents += p.priceCents * i.quantity
+      totalAmount += (p.priceCents / 100) * i.quantity
       return {
         productId: p.id,
         quantity: i.quantity,
@@ -85,7 +85,9 @@ export async function POST(req: Request) {
     const order = await shopDb.order.create({
       data: {
         userId: user.userId,
-        totalCents,
+        customerEmail: user.email,
+        customerName: user.name ?? 'Cliente',
+        total: totalAmount,
         currency,
         status: 'pending',
         items: { create: orderItemsData },
@@ -153,7 +155,7 @@ export async function POST(req: Request) {
           order.id,
           user.email,
           new Date().toISOString(),
-          totalCents,
+          totalAmount,
           currency,
           JSON.stringify(orderItemsData),
         ])
