@@ -87,9 +87,6 @@ export async function POST(req: Request) {
     const order = await shopDb.order.create({
       data: {
         userId: user.userId,
-        customerEmail: user.email,
-        customerName: user.name ?? 'Cliente',
-        total: totalCents / 100,
         totalCents,
         currency,
         status: 'pending',

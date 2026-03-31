@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { shopDb } from '@/lib/dbShop'
+import { authDb } from '@/lib/dbAuth'
 import {
   sendOrderConfirmationToCustomer,
   sendNewOrderNotificationToAdmin,
@@ -101,26 +102,31 @@ export async function POST(req: Request) {
 
     // Si el pago fue aprobado, enviamos las notificaciones por correo
     if (internalStatus === 'paid') {
-      const emailItems = order.items.map((item: any) => ({
+      // Obtenemos los datos del usuario desde la base de datos de autenticación
+      const user = await authDb.user.findUnique({
+        where: { id: order.userId }
+      });
+
+      const emailItems = (order.items as any[]).map((item) => ({
         name: item.product.name,
         quantity: item.quantity,
         price: item.priceCents / 100,
       }));
 
       await sendOrderConfirmationToCustomer({
-        to: order.customerEmail,
-        customerName: order.customerName,
+        to: user?.email ?? 'info@tengu.com.ar',
+        customerName: user?.name ?? 'Cliente',
         orderId: order.id,
         items: emailItems,
-        total: order.total,
+        total: order.totalCents / 100,
       });
 
       await sendNewOrderNotificationToAdmin({
-        to: order.customerEmail,
-        customerName: order.customerName,
+        to: user?.email ?? 'info@tengu.com.ar',
+        customerName: user?.name ?? 'Cliente',
         orderId: order.id,
         items: emailItems,
-        total: order.total,
+        total: order.totalCents / 100,
       });
     }
 
