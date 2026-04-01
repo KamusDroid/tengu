@@ -21,6 +21,12 @@ type MpWebhookBody = {
   id?: string
 }
 
+type OrderItemWithProduct = {
+  priceCents: number
+  quantity: number
+  product: { name: string }
+}
+
 export async function POST(req: Request) {
   try {
     const url = new URL(req.url)
@@ -107,7 +113,7 @@ export async function POST(req: Request) {
         where: { id: order.userId }
       });
 
-      const emailItems = (order.items as any[]).map((item) => ({
+      const emailItems = (order.items as OrderItemWithProduct[]).map((item) => ({
         name: item.product.name,
         quantity: item.quantity,
         price: item.priceCents / 100,

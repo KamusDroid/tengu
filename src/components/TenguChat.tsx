@@ -70,11 +70,11 @@ export default function TenguChat() {
 
   return (
     <>
-      {/* Floating button */}
+      {/* Floating button — above CartDrawer (bottom-4) */}
       <button
         onClick={() => setOpen((v) => !v)}
         aria-label="Abrir chat TENGU"
-        className="fixed bottom-6 right-6 z-[60] w-14 h-14 rounded-full bg-zinc-900 border-2 border-red-600 shadow-lg shadow-red-900/40 flex items-center justify-center hover:border-red-400 hover:shadow-red-600/60 transition-all duration-200"
+        className="fixed bottom-20 right-4 z-[60] w-14 h-14 rounded-full bg-zinc-900 border-2 border-red-600 shadow-lg shadow-red-900/40 flex items-center justify-center hover:border-red-400 hover:shadow-red-600/60 transition-all duration-200"
       >
         <Image
           src="/tomoe.png"
@@ -94,7 +94,7 @@ export default function TenguChat() {
 
       {/* Chat panel */}
       {open && (
-        <div className="fixed bottom-24 right-6 z-[60] w-80 h-[480px] bg-zinc-900 border border-red-800 rounded-xl shadow-2xl shadow-red-900/40 flex flex-col overflow-hidden">
+        <div className="fixed bottom-36 right-4 z-[60] w-80 max-w-[calc(100vw-1rem)] h-[480px] max-h-[70vh] bg-zinc-900 border border-red-800 rounded-xl shadow-2xl shadow-red-900/40 flex flex-col overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-red-900 bg-zinc-950">
             <div className="flex items-center gap-2">

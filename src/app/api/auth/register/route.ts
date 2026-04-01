@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server'
+import { headers } from 'next/headers'
 import { authDb } from '@/lib/dbAuth'
 import { z } from 'zod'
 import bcrypt from 'bcryptjs'
 import { signToken, setAuthCookie } from '@/lib/auth'
-import { sendWelcomeEmail, sendNewUserAlertToAdmin } from "@/lib/mail";
+import { sendWelcomeEmail, sendNewUserAlertToAdmin } from "@/lib/mail"
+import { checkRateLimit } from '@/lib/rateLimit'
 
 const schema = z.object({
   email: z.string().email(),
@@ -13,27 +15,28 @@ const schema = z.object({
 
 export async function POST(req: Request) {
   try {
+    const headersList = await headers()
+    const ip =
+      headersList.get('x-forwarded-for')?.split(',')[0]?.trim() ??
+      headersList.get('x-real-ip') ??
+      'unknown'
+
+    if (!checkRateLimit(`register:${ip}`, 5, 60 * 1000)) {
+      return new NextResponse('Demasiados intentos. Esperá un minuto.', { status: 429 })
+    }
+
     const body = await req.json()
     const { email, password, name } = schema.parse(body)
 
-    const exists = await authDb.user.findUnique({
-      where: { email },
-    })
-
+    const exists = await authDb.user.findUnique({ where: { email } })
     if (exists) {
-      return new NextResponse('Ya existe un usuario con ese email', {
-        status: 400,
-      })
+      return new NextResponse('Ya existe un usuario con ese email', { status: 400 })
     }
 
     const hashed = await bcrypt.hash(password, 10)
 
     const user = await authDb.user.create({
-      data: {
-        email,
-        password: hashed,
-        name,
-      },
+      data: { email, password: hashed, name },
     })
 
     const token = signToken({
@@ -48,14 +51,16 @@ export async function POST(req: Request) {
       name: user.name,
     })
 
-    // Enviar correos de bienvenida tras el registro exitoso
-    await sendWelcomeEmail({ to: email, name });
-    await sendNewUserAlertToAdmin({ to: email, name });
+    await sendWelcomeEmail({ to: email, name })
+    await sendNewUserAlertToAdmin({ to: email, name })
 
     setAuthCookie(response.cookies, token)
     return response
   } catch (err) {
-    console.error(err)
+    if (err instanceof z.ZodError) {
+      return new NextResponse('Datos inválidos', { status: 400 })
+    }
+    console.error('[register]', err)
     return new NextResponse('Error en registro', { status: 500 })
   }
 }
