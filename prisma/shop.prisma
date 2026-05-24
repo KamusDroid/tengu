@@ -53,3 +53,16 @@ model OrderItem {
   createdAt  DateTime @default(now())
 }
 
+model Cupon {
+  id           String    @id @default(uuid())
+  codigo       String    @unique
+  tipo         String    @default("porcentaje")
+  valor        Int
+  minimo       Int?
+  usos         Int       @default(0)
+  usosMaximos  Int?
+  activo       Boolean   @default(true)
+  fechaExpira  DateTime?
+  createdAt    DateTime  @default(now())
+}
+

@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar"
 import Footer from "@/components/Footer"
 import { ThemeProvider } from "@/components/ThemeProvider"
 import TenguChat from "@/components/TenguChat"
+import { I18nProvider } from "@/lib/i18n"
 
 const novaSquare = Nova_Square({
   subsets: ["latin"],
@@ -22,15 +23,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="es"
       suppressHydrationWarning
-      className="w-screen min-h-full bg-white text-zinc-900 dark:bg-zinc-950 dark:text-white transition-colors "
+      className="min-h-full bg-[#050507] text-zinc-900 dark:bg-[#050507] dark:text-white overflow-x-hidden"
     >
-      <body className={`${novaSquare.className} font-sans transition-colors min-h-full`}>
+      <body className={`${novaSquare.className} font-sans min-h-full w-full overflow-x-hidden`}>
         <ThemeProvider>
-
-          <Navbar />
-          <main className="w-screen min-h-screen px-4 py-8">{children}</main>
-          <Footer />
-          <TenguChat />
+          <I18nProvider>
+            <Navbar />
+            {children}
+            <Footer />
+            <TenguChat />
+          </I18nProvider>
         </ThemeProvider>
       </body>
     </html>

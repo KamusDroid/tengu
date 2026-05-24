@@ -17,6 +17,15 @@ const WELCOME_MESSAGE: Message = {
 export default function TenguChat() {
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([WELCOME_MESSAGE])
+  const [chatActivo, setChatActivo] = useState(true)
+  const [mantenimiento, setMantenimiento] = useState(false)
+
+  useEffect(() => {
+    fetch('/api/public/chat-status')
+      .then((r) => r.ok ? r.json() : null)
+      .then((d) => { if (d) { setChatActivo(d.activo); setMantenimiento(d.modoMantenimiento) } })
+      .catch(() => {})
+  }, [])
   const [input, setInput] = useState("")
   const [loading, setLoading] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
@@ -68,20 +77,22 @@ export default function TenguChat() {
     }
   }
 
+  if (!chatActivo) return null
+
   return (
     <>
       {/* Floating button — above CartDrawer (bottom-4) */}
       <button
         onClick={() => setOpen((v) => !v)}
         aria-label="Abrir chat TENGU"
-        className="fixed bottom-20 right-4 z-[60] w-14 h-14 rounded-full bg-zinc-900 border-2 border-red-600 shadow-lg shadow-red-900/40 flex items-center justify-center hover:border-red-400 hover:shadow-red-600/60 transition-all duration-200"
+        className="fixed bottom-4 right-4 z-[60] w-14 h-14 rounded-full bg-zinc-900 border-2 border-red-600 shadow-lg shadow-red-900/40 flex items-center justify-center hover:border-red-400 hover:shadow-red-600/60 transition-all duration-200"
       >
         <Image
           src="/tomoe.png"
           alt="TENGU"
           width={32}
           height={32}
-          className="object-contain"
+          style={{ width: '32px', height: '32px' }}
           onError={(e) => {
             const img = e.currentTarget as HTMLImageElement
             img.style.display = "none"
@@ -94,7 +105,7 @@ export default function TenguChat() {
 
       {/* Chat panel */}
       {open && (
-        <div className="fixed bottom-36 right-4 z-[60] w-80 max-w-[calc(100vw-1rem)] h-[480px] max-h-[70vh] bg-zinc-900 border border-red-800 rounded-xl shadow-2xl shadow-red-900/40 flex flex-col overflow-hidden">
+        <div className="fixed bottom-20 right-4 z-[60] w-80 max-w-[calc(100vw-1rem)] h-[480px] max-h-[70vh] bg-zinc-900 border border-red-800 rounded-xl shadow-2xl shadow-red-900/40 flex flex-col overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-red-900 bg-zinc-950">
             <div className="flex items-center gap-2">
@@ -112,7 +123,12 @@ export default function TenguChat() {
 
           {/* Messages */}
           <div className="flex-1 overflow-y-auto px-3 py-3 space-y-3 scrollbar-thin scrollbar-thumb-zinc-700">
-            {messages.map((msg, i) => (
+            {mantenimiento && (
+              <div className="text-center text-sm text-zinc-500 py-8">
+                El chat está en mantenimiento. Volvé pronto.
+              </div>
+            )}
+            {!mantenimiento && messages.map((msg, i) => (
               <div
                 key={i}
                 className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
@@ -129,7 +145,7 @@ export default function TenguChat() {
               </div>
             ))}
 
-            {loading && (
+            {!mantenimiento && loading && (
               <div className="flex justify-start">
                 <div className="bg-zinc-800 border border-zinc-700 rounded-lg rounded-bl-none px-4 py-2">
                   <span className="flex gap-1 items-center">
@@ -145,7 +161,7 @@ export default function TenguChat() {
           </div>
 
           {/* Input */}
-          <div className="px-3 py-3 border-t border-red-900 bg-zinc-950 flex gap-2">
+          {!mantenimiento && <div className="px-3 py-3 border-t border-red-900 bg-zinc-950 flex gap-2">
             <input
               ref={inputRef}
               type="text"
@@ -165,7 +181,7 @@ export default function TenguChat() {
             >
               <Send size={16} />
             </button>
-          </div>
+          </div>}
         </div>
       )}
     </>

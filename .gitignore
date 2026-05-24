@@ -41,3 +41,9 @@ yarn-error.log*
 next-env.d.ts
 
 .claude/
+.vercel
+.env*
+
+# uploads — ignorar archivos pero trackear la carpeta
+/public/uploads/**
+!/public/uploads/.gitkeep

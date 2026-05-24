@@ -1,0 +1,67 @@
+// prisma/shop.prisma
+datasource db {
+  provider = "postgresql"
+  url      = env("SHOP_DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/shop"
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  imageUrl    String?
+  priceCents  Int
+  currency    String   @default("usd")
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  orderItems OrderItem[]
+}
+
+model Order {
+  id         String   @id @default(uuid())
+  userId     String
+  totalCents Int
+  currency   String   @default("usd")
+  status     String   @default("pending") // pending, paid, failed
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Mercado Pago
+  mpPreferenceId String?
+  mpPaymentId    String?
+  mpStatus       String?
+  mpStatusDetail String?
+
+  items OrderItem[]
+}
+
+model OrderItem {
+  id         String   @id @default(uuid())
+  order      Order    @relation(fields: [orderId], references: [id])
+  orderId    String
+  product    Product  @relation(fields: [productId], references: [id])
+  productId  String
+  quantity   Int      @default(1)
+  priceCents Int
+  currency   String   @default("usd")
+  createdAt  DateTime @default(now())
+}
+
+model Cupon {
+  id          String    @id @default(uuid())
+  codigo      String    @unique
+  tipo        String    @default("porcentaje")
+  valor       Int
+  minimo      Int?
+  usos        Int       @default(0)
+  usosMaximos Int?
+  activo      Boolean   @default(true)
+  fechaExpira DateTime?
+  createdAt   DateTime  @default(now())
+}

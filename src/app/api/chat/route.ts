@@ -3,6 +3,7 @@ import { headers } from "next/headers"
 import { z } from "zod"
 import { chatWithGroq } from "@/lib/groq"
 import { checkRateLimit } from "@/lib/rateLimit"
+import { crmDb } from "@/lib/dbCrm"
 
 const MessageSchema = z.object({
   role: z.enum(["user", "assistant"]),
@@ -28,8 +29,18 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     const { messages } = BodySchema.parse(body)
 
+    let systemPrompt: string | undefined
+    try {
+      const config = await crmDb.configuracionSitio.findUnique({
+        where: { clave: 'chat.system_prompt' },
+      })
+      systemPrompt = config?.valor ?? undefined
+    } catch {
+      systemPrompt = undefined
+    }
+
     const limitedMessages = messages.slice(-10)
-    const reply = await chatWithGroq(limitedMessages)
+    const reply = await chatWithGroq(limitedMessages, systemPrompt)
 
     return NextResponse.json({ reply })
   } catch (err) {

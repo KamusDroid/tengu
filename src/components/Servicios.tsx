@@ -1,42 +1,35 @@
-import Link from "next/link"
-import { Brain, Code2, MousePointerClick } from "lucide-react"
+'use client'
 
-import { services } from "@/lib/content"
-
-const iconLibrary = {
-  Brain,
-  Code2,
-  MousePointerClick
-}
+import { useI18n } from '@/lib/i18n'
 
 export default function Servicios() {
-  return (
-    <section id="servicios" aria-labelledby="servicios-title" className="mx-auto max-w-6xl px-4 py-20">
-      <div className="text-center">
-        <h2 id="servicios-title" className="mb-12 text-3xl font-bold">
-          Servicios
-        </h2>
-      </div>
-      <div className="grid gap-8 md:grid-cols-3">
-        {services.map(({ icon, titulo, descripcion, url }) => {
-          const Icon = iconLibrary[icon as keyof typeof iconLibrary]
-          const isExternal = url.startsWith("http")
+  const { t } = useI18n()
 
-          return (
-            <Link
-              key={titulo}
-              href={url}
-              target={isExternal ? "_blank" : undefined}
-              rel={isExternal ? "noopener noreferrer" : undefined}
-              prefetch={isExternal ? false : undefined}
-              className="vortex-hover block rounded-xl border border-[#796363] bg-[#615353] p-6 text-center transition-transform hover:scale-105 hover:shadow-lg"
-            >
-              {Icon && <Icon aria-hidden className="mx-auto mb-4 h-10 w-10 text-red-800" />}
-              <h3 className="mb-2 text-xl font-semibold  text-red-800">{titulo}</h3>
-              <p className="font-semibold text-gray-400">{descripcion}</p>
-            </Link>
-          )
-        })}
+  return (
+    <section id="servicios" style={{ padding: 'clamp(32px,6vw,56px) clamp(16px,5vw,40px)', background: '#050507' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '32px', overflow: 'hidden' }}>
+        <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '3px', color: 'rgba(240,237,230,0.22)', flexShrink: 0 }}>
+          Servicios — 6 disciplinas
+        </span>
+        <div style={{ flex: 1, height: '0.5px', background: 'rgba(192,57,43,0.18)', minWidth: '12px' }} />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3" style={{ gap: '1px', background: 'rgba(192,57,43,0.18)' }}>
+        {t.services.map((s) => (
+          <div key={s.numero} style={{ background: '#050507', padding: '24px 20px', position: 'relative', overflow: 'hidden' }}>
+            <div style={{ position: 'absolute', top: '-40px', left: '-40px', width: '120px', height: '120px', background: 'radial-gradient(circle, rgba(192,57,43,0.06) 0%, transparent 70%)', pointerEvents: 'none' }} />
+            <div style={{ fontSize: '10px', color: 'rgba(192,57,43,0.5)', marginBottom: '6px' }}>{s.numero}</div>
+            <div style={{ fontSize: '14px', fontWeight: 500, color: '#f0ede6', marginBottom: '8px' }}>{s.titulo}</div>
+            <div style={{ fontSize: '12px', color: 'rgba(240,237,230,0.38)', lineHeight: 1.55 }}>{s.descripcion}</div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '10px' }}>
+              {s.tags.map((tag) => (
+                <span key={tag} style={{ fontSize: '10px', color: 'rgba(240,237,230,0.24)', border: '0.5px solid rgba(240,237,230,0.09)', padding: '2px 6px', borderRadius: '1px' }}>
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
     </section>
   )

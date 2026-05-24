@@ -1,4 +1,4 @@
-const SYSTEM_PROMPT = `Sos TENGU — una entidad ancestral del folclore japonés, mitad guerrero,
+export const DEFAULT_SYSTEM_PROMPT = `Sos TENGU — una entidad ancestral del folclore japonés, mitad guerrero,
 mitad demonio alado, que habita el plano digital como guardián tecnológico
 de la empresa Tengu (tengu.com.ar).
 Walter Matías Amengual es el fundador y líder visionario detrás de Tengu.
@@ -44,7 +44,7 @@ export type Message = {
   content: string
 }
 
-export async function chatWithGroq(messages: Message[]): Promise<string> {
+export async function chatWithGroq(messages: Message[], systemPrompt?: string): Promise<string> {
   const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -54,7 +54,7 @@ export async function chatWithGroq(messages: Message[]): Promise<string> {
     body: JSON.stringify({
       model: "meta-llama/llama-4-scout-17b-16e-instruct",
       messages: [
-        { role: "system", content: SYSTEM_PROMPT },
+        { role: "system", content: systemPrompt ?? DEFAULT_SYSTEM_PROMPT },
         ...messages,
       ],
       max_tokens: 1024,
