@@ -157,13 +157,14 @@ function buildHTML(f: {
   .invoice {
     width: 794px; min-height: 1123px; margin: 32px auto; background: var(--bg1);
     border: 0.5px solid var(--border); box-shadow: 0 20px 60px rgba(0,0,0,0.5); position: relative;
+    display: flex; flex-direction: column;
   }
   .header {
     background: var(--bg0); padding: 40px 56px 32px; display: flex; justify-content: space-between;
     position: relative; overflow: hidden;
   }
   .header .brand { font-weight: 600; font-size: 22px; letter-spacing: 4px; color: var(--red); }
-  .header .logo-img { max-height: 48px; max-width: 220px; object-fit: contain; display: block; }
+  .header .logo-img { max-height: 84px; max-width: 300px; object-fit: contain; display: block; }
   .header .tagline { font-size: 11px; color: var(--muted2); margin-top: 8px; letter-spacing: 0.3px; }
   .header .titulo {
     font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted2);
@@ -220,7 +221,7 @@ function buildHTML(f: {
   .footer-section .col.notas { border-right: 0.5px solid var(--border); }
   .footer-section .label { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--red); margin-bottom: 8px; }
   .footer-section .txt { font-size: 12px; white-space: pre-line; color: var(--muted); }
-  .bottom { background: var(--bg0); border-top: 2px solid var(--red); padding: 20px 56px; display: flex; justify-content: space-between; align-items: center; }
+  .bottom { background: var(--bg0); border-top: 2px solid var(--red); padding: 20px 56px; display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
   .bottom .brand { font-weight: 500; color: var(--muted2); font-size: 12px; letter-spacing: 3px; }
   .bottom .contacto { font-family: monospace; font-size: 10px; color: var(--muted2); }
   [contenteditable="true"] { outline: 1px dashed rgba(230,57,70,0.4); background: rgba(230,57,70,0.05); }
