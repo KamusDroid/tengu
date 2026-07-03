@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { getUserFromCookie, isAdmin } from '@/lib/auth'
 import { crmDb } from '@/lib/dbCrm'
+import { shopDb } from '@/lib/dbShop'
 import { EditarFacturaClient } from './editar-factura-client'
 
 export const dynamic = 'force-dynamic'
@@ -17,11 +18,18 @@ export default async function EditarFacturaPage({ params }: { params: Promise<{ 
   })
   if (!factura) redirect('/admin/facturacion')
 
-  const clientes = await crmDb.billingClient.findMany({
-    where: { estado: { in: ['active', 'prospect'] } },
-    orderBy: { nombre: 'asc' },
-    select: { id: true, nombre: true },
-  })
+  const [clientes, productos] = await Promise.all([
+    crmDb.billingClient.findMany({
+      where: { estado: { in: ['active', 'prospect'] } },
+      orderBy: { nombre: 'asc' },
+      select: { id: true, nombre: true },
+    }),
+    shopDb.product.findMany({
+      where: { active: true },
+      orderBy: { name: 'asc' },
+      select: { id: true, name: true, priceCents: true, currency: true },
+    }),
+  ])
 
   let items: Array<{ descripcion: string; cantidad: number; precio: number }> = []
   try {
@@ -39,6 +47,7 @@ export default async function EditarFacturaPage({ params }: { params: Promise<{ 
         descripcion: factura.descripcion,
         moneda: factura.moneda,
         tasaIva: factura.tasaIva,
+        descuento: factura.descuento,
         venceEn: factura.venceEn.toISOString(),
         estado: factura.estado as 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled',
         notas: factura.notas,
@@ -46,6 +55,12 @@ export default async function EditarFacturaPage({ params }: { params: Promise<{ 
       }}
       items={items}
       clientes={clientes}
+      productos={productos.map((p) => ({
+        id: p.id,
+        nombre: p.name,
+        precioCents: p.priceCents,
+        moneda: p.currency.toUpperCase(),
+      }))}
     />
   )
 }

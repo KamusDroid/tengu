@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { getUserFromCookie, isAdmin } from '@/lib/auth'
 import { crmDb } from '@/lib/dbCrm'
+import { shopDb } from '@/lib/dbShop'
 import { FinanzasClient } from './finanzas-client'
 
 export const dynamic = 'force-dynamic'
@@ -9,7 +10,7 @@ export default async function FacturacionPage() {
   const user = await getUserFromCookie()
   if (!isAdmin(user)) redirect('/')
 
-  const [facturas, contratos, clientes] = await Promise.all([
+  const [facturas, contratos, clientes, productos] = await Promise.all([
     crmDb.invoice.findMany({
       where: { estado: { not: 'cancelled' } },
       orderBy: { emitidaEn: 'desc' },
@@ -24,6 +25,11 @@ export default async function FacturacionPage() {
       where: { estado: { in: ['active', 'prospect'] } },
       orderBy: { nombre: 'asc' },
     }),
+    shopDb.product.findMany({
+      where: { active: true },
+      orderBy: { name: 'asc' },
+      select: { id: true, name: true, priceCents: true, currency: true },
+    }),
   ])
 
   return (
@@ -36,6 +42,7 @@ export default async function FacturacionPage() {
         clienteEmail: f.cliente.email,
         subtotal: f.subtotal,
         tasaIva: f.tasaIva,
+        descuento: f.descuento,
         total: f.total,
         moneda: f.moneda,
         estado: f.estado as 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled',
@@ -68,6 +75,12 @@ export default async function FacturacionPage() {
         estado: c.estado,
         datosPago: c.datosPago,
         notas: c.notas,
+      }))}
+      productos={productos.map((p) => ({
+        id: p.id,
+        nombre: p.name,
+        precioCents: p.priceCents,
+        moneda: p.currency.toUpperCase(),
       }))}
     />
   )

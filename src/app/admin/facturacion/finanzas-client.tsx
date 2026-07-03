@@ -20,6 +20,7 @@ type FacturaRow = {
   clienteEmail: string | null
   subtotal: number
   tasaIva: number
+  descuento: number
   total: number
   moneda: string
   estado: EstadoFactura
@@ -56,6 +57,8 @@ type ClienteRow = {
   notas: string | null
 }
 
+type ProductoRow = { id: string; nombre: string; precioCents: number; moneda: string }
+
 type ItemRow = { descripcion: string; cantidad: string; precio: string }
 
 const EMPTY_ITEM: ItemRow = { descripcion: '', cantidad: '1', precio: '' }
@@ -65,10 +68,19 @@ const EMPTY_FACTURA_FORM = {
   descripcion: '',
   moneda: 'ARS',
   tasaIva: '21',
+  descuento: '',
   venceEn: '',
   estado: 'draft' as EstadoFactura,
   datosPago: '',
   notas: '',
+}
+
+const EMPTY_CONTRATO_FORM = {
+  clienteId: '',
+  valorMensual: '',
+  moneda: 'ARS',
+  inicioContrato: '',
+  renovacionContrato: '',
 }
 
 const EMPTY_CLIENTE_FORM = {
@@ -111,15 +123,18 @@ export function FinanzasClient({
   facturas: initialFacturas,
   contratos,
   clientes: initialClientes,
+  productos,
 }: {
   facturas: FacturaRow[]
   contratos: ContratoRow[]
   clientes: ClienteRow[]
+  productos: ProductoRow[]
 }) {
   const router = useRouter()
   const [tab, setTab] = useState<'facturas' | 'contratos' | 'clientes'>('facturas')
   const [panelFactura, setPanelFactura] = useState(false)
   const [panelCliente, setPanelCliente] = useState(false)
+  const [panelContrato, setPanelContrato] = useState(false)
   const [editando, setEditando] = useState<FacturaRow | null>(null)
   const [editandoCliente, setEditandoCliente] = useState<ClienteRow | null>(null)
   const [loading, setLoading] = useState(false)
@@ -128,6 +143,7 @@ export function FinanzasClient({
   const [facturaForm, setFacturaForm] = useState(EMPTY_FACTURA_FORM)
   const [items, setItems] = useState<ItemRow[]>([EMPTY_ITEM])
   const [clienteForm, setClienteForm] = useState(EMPTY_CLIENTE_FORM)
+  const [contratoForm, setContratoForm] = useState(EMPTY_CONTRATO_FORM)
 
   const mrr = contratos.reduce((s, c) => s + c.valorMensual, 0)
   const arr = mrr * 12
@@ -149,6 +165,7 @@ export function FinanzasClient({
       descripcion: f.descripcion ?? '',
       moneda: f.moneda,
       tasaIva: String(f.tasaIva),
+      descuento: f.descuento ? String(f.descuento / 100) : '',
       venceEn: f.venceEn.slice(0, 10),
       estado: f.estado === 'sent' ? 'sent' : 'draft',
       datosPago: f.datosPago ?? '',
@@ -194,11 +211,22 @@ export function FinanzasClient({
     setPanelCliente(true)
   }
 
+  function openNuevoContrato() {
+    setContratoForm(EMPTY_CONTRATO_FORM)
+    setError('')
+    setPanelContrato(true)
+  }
+
   function itemField(i: number, k: keyof ItemRow, v: string) {
     setItems((arr) => arr.map((it, idx) => (idx === i ? { ...it, [k]: v } : it)))
   }
   function addItem() { setItems((arr) => [...arr, { ...EMPTY_ITEM }]) }
   function removeItem(i: number) { setItems((arr) => (arr.length > 1 ? arr.filter((_, idx) => idx !== i) : arr)) }
+  function selectProducto(i: number, productoId: string) {
+    const p = productos.find((prod) => prod.id === productoId)
+    if (!p) return
+    setItems((arr) => arr.map((it, idx) => (idx === i ? { ...it, descripcion: p.nombre, precio: String(p.precioCents / 100) } : it)))
+  }
 
   const subtotalCents = items.reduce((s, it) => {
     const cant = parseFloat(it.cantidad) || 0
@@ -207,7 +235,8 @@ export function FinanzasClient({
   }, 0)
   const tasaIvaNum = parseFloat(facturaForm.tasaIva) || 0
   const ivaCents = Math.round(subtotalCents * (tasaIvaNum / 100))
-  const totalCents = subtotalCents + ivaCents
+  const descuentoCents = Math.round((parseFloat(facturaForm.descuento) || 0) * 100)
+  const totalCents = subtotalCents + ivaCents - descuentoCents
 
   async function guardarFactura() {
     if (!facturaForm.clienteId) { setError('Seleccioná un cliente'); return }
@@ -225,6 +254,7 @@ export function FinanzasClient({
         }))),
         subtotalCents,
         tasaIva: tasaIvaNum,
+        descuentoCents,
         moneda: facturaForm.moneda,
         venceEn: facturaForm.venceEn,
         estado: facturaForm.estado,
@@ -290,6 +320,33 @@ export function FinanzasClient({
     }
   }
 
+  async function guardarContrato() {
+    if (!contratoForm.clienteId) { setError('Seleccioná un cliente'); return }
+    if (!contratoForm.renovacionContrato) { setError('Ingresá la fecha de renovación'); return }
+    setLoading(true); setError('')
+    try {
+      const res = await fetch('/api/admin/clientes-billing', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: contratoForm.clienteId,
+          valorMensualCents: contratoForm.valorMensual ? Math.round(parseFloat(contratoForm.valorMensual) * 100) : 0,
+          moneda: contratoForm.moneda,
+          inicioContrato: contratoForm.inicioContrato || null,
+          renovacionContrato: contratoForm.renovacionContrato,
+          estado: 'active',
+        }),
+      })
+      if (!res.ok) { setError(await res.text()); return }
+      setPanelContrato(false)
+      router.refresh()
+    } catch {
+      setError('Error al guardar el contrato')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const inp: React.CSSProperties = {
     width: '100%', background: S.bg0, border: `0.5px solid ${S.border}`,
     color: S.text, padding: '8px 10px', fontSize: '12px', borderRadius: '2px', boxSizing: 'border-box',
@@ -340,6 +397,11 @@ export function FinanzasClient({
         {tab === 'facturas' && (
           <button onClick={openNuevaFactura} style={{ background: S.red, color: '#fff', padding: '8px 18px', fontSize: '12px', borderRadius: '2px', border: 'none', cursor: 'pointer', marginBottom: '8px' }}>
             + Nueva factura
+          </button>
+        )}
+        {tab === 'contratos' && (
+          <button onClick={openNuevoContrato} style={{ background: S.red, color: '#fff', padding: '8px 18px', fontSize: '12px', borderRadius: '2px', border: 'none', cursor: 'pointer', marginBottom: '8px' }}>
+            + Nuevo contrato
           </button>
         )}
         {tab === 'clientes' && (
@@ -552,12 +614,26 @@ export function FinanzasClient({
                     const cant = parseFloat(it.cantidad) || 0
                     const precio = parseFloat(it.precio) || 0
                     return (
-                      <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 50px 70px 70px 20px', gap: '4px', padding: '6px 8px', alignItems: 'center', borderBottom: i < items.length - 1 ? `0.5px solid ${S.border}` : 'none' }}>
-                        <input style={{ ...inp, padding: '5px 6px', fontSize: '11px' }} value={it.descripcion} onChange={(e) => itemField(i, 'descripcion', e.target.value)} placeholder="Servicio" />
-                        <input style={{ ...inp, padding: '5px 6px', fontSize: '11px' }} type="number" value={it.cantidad} onChange={(e) => itemField(i, 'cantidad', e.target.value)} />
-                        <input style={{ ...inp, padding: '5px 6px', fontSize: '11px' }} type="number" value={it.precio} onChange={(e) => itemField(i, 'precio', e.target.value)} />
-                        <div style={{ fontSize: '11px', fontFamily: 'monospace', color: S.muted }}>{(cant * precio).toLocaleString('es-AR')}</div>
-                        <button onClick={() => removeItem(i)} style={{ background: 'transparent', border: 'none', color: S.muted2, cursor: 'pointer' }}>✕</button>
+                      <div key={i} style={{ padding: '6px 8px', borderBottom: i < items.length - 1 ? `0.5px solid ${S.border}` : 'none' }}>
+                        {productos.length > 0 && (
+                          <select
+                            style={{ ...inp, padding: '5px 6px', fontSize: '11px', marginBottom: '4px' }}
+                            value=""
+                            onChange={(e) => { if (e.target.value) selectProducto(i, e.target.value) }}
+                          >
+                            <option value="">Producto existente (opcional)...</option>
+                            {productos.map((p) => (
+                              <option key={p.id} value={p.id}>{p.nombre} — {fmtMoney(p.precioCents, p.moneda)}</option>
+                            ))}
+                          </select>
+                        )}
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 50px 70px 70px 20px', gap: '4px', alignItems: 'center' }}>
+                          <input style={{ ...inp, padding: '5px 6px', fontSize: '11px' }} value={it.descripcion} onChange={(e) => itemField(i, 'descripcion', e.target.value)} placeholder="Servicio" />
+                          <input style={{ ...inp, padding: '5px 6px', fontSize: '11px' }} type="number" value={it.cantidad} onChange={(e) => itemField(i, 'cantidad', e.target.value)} />
+                          <input style={{ ...inp, padding: '5px 6px', fontSize: '11px' }} type="number" value={it.precio} onChange={(e) => itemField(i, 'precio', e.target.value)} />
+                          <div style={{ fontSize: '11px', fontFamily: 'monospace', color: S.muted }}>{(cant * precio).toLocaleString('es-AR')}</div>
+                          <button onClick={() => removeItem(i)} style={{ background: 'transparent', border: 'none', color: S.muted2, cursor: 'pointer' }}>✕</button>
+                        </div>
                       </div>
                     )
                   })}
@@ -572,6 +648,16 @@ export function FinanzasClient({
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', color: S.muted }}>
                     <span>IVA ({tasaIvaNum}%)</span><span style={{ fontFamily: 'monospace' }}>{fmtMoney(ivaCents, facturaForm.moneda)}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: S.muted }}>
+                    <span>Descuento</span>
+                    <input
+                      style={{ ...inp, width: '90px', padding: '4px 6px', fontSize: '11px', fontFamily: 'monospace', textAlign: 'right' }}
+                      type="number"
+                      value={facturaForm.descuento}
+                      onChange={(e) => setFacturaForm((f) => ({ ...f, descuento: e.target.value }))}
+                      placeholder="0"
+                    />
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', color: S.text, fontWeight: 500, fontSize: '13px', marginTop: '4px' }}>
                     <span>Total</span><span style={{ fontFamily: 'monospace' }}>{fmtMoney(totalCents, facturaForm.moneda)}</span>
@@ -643,6 +729,59 @@ export function FinanzasClient({
 
               <button onClick={guardarCliente} disabled={loading} style={{ background: S.red, color: '#fff', padding: '10px', fontSize: '12px', borderRadius: '2px', border: 'none', cursor: loading ? 'default' : 'pointer', opacity: loading ? 0.6 : 1, marginTop: '4px' }}>
                 {loading ? 'Guardando...' : editandoCliente ? 'Guardar cambios' : 'Crear cliente'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {panelContrato && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 49, background: 'rgba(0,0,0,0.4)' }} onClick={() => setPanelContrato(false)}>
+          <div
+            style={{ position: 'fixed', right: 0, top: 0, bottom: 0, width: '440px', background: S.bg1, borderLeft: `0.5px solid ${S.border}`, zIndex: 50, overflowY: 'auto', padding: '24px', boxSizing: 'border-box' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <div style={{ fontSize: '15px', fontWeight: 500, color: S.text }}>Nuevo contrato</div>
+              <button onClick={() => setPanelContrato(false)} style={{ background: 'transparent', border: 'none', color: S.muted2, cursor: 'pointer', fontSize: '16px' }}>✕</button>
+            </div>
+
+            {error && <div style={{ fontSize: '12px', color: S.error, background: 'rgba(224,82,82,0.08)', padding: '8px 12px', borderRadius: '2px', marginBottom: '14px' }}>{error}</div>}
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div>
+                <label style={lbl}>Cliente *</label>
+                <select style={inp} value={contratoForm.clienteId} onChange={(e) => setContratoForm((f) => ({ ...f, clienteId: e.target.value }))}>
+                  <option value="">Seleccionar...</option>
+                  {initialClientes.map((c) => <option key={c.id} value={c.id}>{c.nombre}</option>)}
+                </select>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <div>
+                  <label style={lbl}>Fee mensual</label>
+                  <input style={inp} type="number" step="0.01" value={contratoForm.valorMensual} onChange={(e) => setContratoForm((f) => ({ ...f, valorMensual: e.target.value }))} />
+                </div>
+                <div>
+                  <label style={lbl}>Moneda</label>
+                  <select style={inp} value={contratoForm.moneda} onChange={(e) => setContratoForm((f) => ({ ...f, moneda: e.target.value }))}>
+                    <option value="ARS">ARS</option>
+                    <option value="USD">USD</option>
+                  </select>
+                </div>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <div>
+                  <label style={lbl}>Inicio contrato</label>
+                  <input type="date" style={inp} value={contratoForm.inicioContrato} onChange={(e) => setContratoForm((f) => ({ ...f, inicioContrato: e.target.value }))} />
+                </div>
+                <div>
+                  <label style={lbl}>Renovación *</label>
+                  <input type="date" style={inp} value={contratoForm.renovacionContrato} onChange={(e) => setContratoForm((f) => ({ ...f, renovacionContrato: e.target.value }))} />
+                </div>
+              </div>
+
+              <button onClick={guardarContrato} disabled={loading} style={{ background: S.red, color: '#fff', padding: '10px', fontSize: '12px', borderRadius: '2px', border: 'none', cursor: loading ? 'default' : 'pointer', opacity: loading ? 0.6 : 1, marginTop: '4px' }}>
+                {loading ? 'Guardando...' : 'Crear contrato'}
               </button>
             </div>
           </div>

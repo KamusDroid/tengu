@@ -9,6 +9,7 @@ const CreateSchema = z.object({
   items: z.string().optional().nullable(),
   subtotalCents: z.number().int().nonnegative(),
   tasaIva: z.number(),
+  descuentoCents: z.number().int().nonnegative().default(0),
   moneda: z.string().default('ARS'),
   venceEn: z.string().min(1),
   estado: z.enum(['draft', 'sent']).default('draft'),
@@ -23,6 +24,7 @@ const UpdateSchema = z.object({
   items: z.string().optional().nullable(),
   subtotalCents: z.number().int().nonnegative().optional(),
   tasaIva: z.number().optional(),
+  descuentoCents: z.number().int().nonnegative().optional(),
   venceEn: z.string().optional(),
   notas: z.string().optional().nullable(),
   datosPago: z.string().optional().nullable(),
@@ -54,7 +56,7 @@ export async function POST(req: Request) {
   const numero = `FAC-${yyyymm}-${seq}`
 
   const montoIva = Math.round(data.subtotalCents * (data.tasaIva / 100))
-  const total = data.subtotalCents + montoIva
+  const total = data.subtotalCents + montoIva - data.descuentoCents
 
   const factura = await crmDb.invoice.create({
     data: {
@@ -65,6 +67,7 @@ export async function POST(req: Request) {
       subtotal: data.subtotalCents,
       tasaIva: data.tasaIva,
       montoIva,
+      descuento: data.descuentoCents,
       total,
       moneda: data.moneda,
       estado: data.estado,
@@ -87,12 +90,14 @@ export async function PUT(req: Request) {
 
   let montoIva: number | undefined
   let total: number | undefined
-  if (rest.subtotalCents !== undefined) {
+  if (rest.subtotalCents !== undefined || rest.descuentoCents !== undefined || rest.tasaIva !== undefined) {
     const existing = await crmDb.invoice.findUnique({ where: { id } })
     if (!existing) return NextResponse.json({ error: 'Factura no encontrada' }, { status: 404 })
+    const subtotalCents = rest.subtotalCents ?? existing.subtotal
     const tasaIva = rest.tasaIva ?? existing.tasaIva
-    montoIva = Math.round(rest.subtotalCents * (tasaIva / 100))
-    total = rest.subtotalCents + montoIva
+    const descuentoCents = rest.descuentoCents ?? existing.descuento
+    montoIva = Math.round(subtotalCents * (tasaIva / 100))
+    total = subtotalCents + montoIva - descuentoCents
   }
 
   const factura = await crmDb.invoice.update({
@@ -101,8 +106,10 @@ export async function PUT(req: Request) {
       ...(rest.estado !== undefined ? { estado: rest.estado } : {}),
       ...(rest.descripcion !== undefined ? { descripcion: rest.descripcion } : {}),
       ...(rest.items !== undefined ? { items: rest.items } : {}),
-      ...(rest.subtotalCents !== undefined ? { subtotal: rest.subtotalCents, montoIva, total } : {}),
+      ...(rest.subtotalCents !== undefined ? { subtotal: rest.subtotalCents } : {}),
+      ...(rest.descuentoCents !== undefined ? { descuento: rest.descuentoCents } : {}),
       ...(rest.tasaIva !== undefined ? { tasaIva: rest.tasaIva } : {}),
+      ...(montoIva !== undefined ? { montoIva, total } : {}),
       ...(rest.venceEn !== undefined ? { venceEn: new Date(rest.venceEn) } : {}),
       ...(rest.notas !== undefined ? { notas: rest.notas } : {}),
       ...(rest.datosPago !== undefined ? { datosPago: rest.datosPago } : {}),

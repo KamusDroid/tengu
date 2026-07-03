@@ -10,7 +10,7 @@ const S = {
 
 const CARPETAS = ['productos', 'blog', 'academia', 'marca', 'equipo']
 
-type Archivo = { nombre: string; url: string; carpeta: string }
+type Archivo = { name: string; url: string; size: number }
 
 export default function MediosPage() {
   const [carpeta, setCarpeta] = useState('productos')
@@ -24,7 +24,7 @@ export default function MediosPage() {
   useEffect(() => { load() }, [carpeta])
 
   async function load() {
-    const res = await fetch(`/api/admin/medios?carpeta=${carpeta}`)
+    const res = await fetch(`/api/admin/medios?folder=${carpeta}`)
     if (res.ok) setArchivos(await res.json())
   }
 
@@ -34,7 +34,7 @@ export default function MediosPage() {
     for (const file of Array.from(files)) {
       const fd = new FormData()
       fd.append('file', file)
-      fd.append('carpeta', carpeta)
+      fd.append('folder', carpeta)
       try {
         const res = await fetch('/api/admin/medios', { method: 'POST', body: fd })
         if (!res.ok) { setError(await res.text()); break }
@@ -46,7 +46,11 @@ export default function MediosPage() {
 
   async function del(nombre: string) {
     if (!confirm(`¿Eliminar ${nombre}?`)) return
-    await fetch(`/api/admin/medios?carpeta=${carpeta}&nombre=${encodeURIComponent(nombre)}`, { method: 'DELETE' })
+    await fetch('/api/admin/medios', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filePath: `public/uploads/${carpeta}/${nombre}` }),
+    })
     await load()
   }
 
@@ -117,17 +121,17 @@ export default function MediosPage() {
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '10px' }}>
           {archivos.map((a) => (
-            <div key={a.nombre} style={{ background: S.bg1, border: `0.5px solid ${S.border}`, borderRadius: '2px', overflow: 'hidden', position: 'relative' }}>
-              {isImage(a.nombre) ? (
+            <div key={a.name} style={{ background: S.bg1, border: `0.5px solid ${S.border}`, borderRadius: '2px', overflow: 'hidden', position: 'relative' }}>
+              {isImage(a.name) ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={a.url} alt={a.nombre} style={{ width: '100%', height: '110px', objectFit: 'cover', display: 'block' }} />
+                <img src={a.url} alt={a.name} style={{ width: '100%', height: '110px', objectFit: 'cover', display: 'block' }} />
               ) : (
                 <div style={{ width: '100%', height: '110px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(240,237,230,0.03)', fontSize: '28px' }}>
                   📄
                 </div>
               )}
               <div style={{ padding: '8px' }}>
-                <div style={{ fontSize: '10px', color: S.muted2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '6px' }}>{a.nombre}</div>
+                <div style={{ fontSize: '10px', color: S.muted2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '6px' }}>{a.name}</div>
                 <div style={{ display: 'flex', gap: '4px' }}>
                   <button
                     onClick={() => copyUrl(a.url)}
@@ -136,7 +140,7 @@ export default function MediosPage() {
                     {copied === a.url ? '✓ Copiado' : 'Copiar URL'}
                   </button>
                   <button
-                    onClick={() => del(a.nombre)}
+                    onClick={() => del(a.name)}
                     style={{ background: 'transparent', border: `0.5px solid ${S.border}`, color: S.muted2, padding: '3px 6px', fontSize: '9px', borderRadius: '2px', cursor: 'pointer' }}
                   >
                     ✕

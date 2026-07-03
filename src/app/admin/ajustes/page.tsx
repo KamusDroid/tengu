@@ -28,6 +28,12 @@ const SECCIONES: { titulo: string; campos: Campo[] }[] = [
     ],
   },
   {
+    titulo: 'Facturación',
+    campos: [
+      { clave: 'facturacion.logo_url', label: 'Logo de la factura (URL)', placeholder: '/uploads/marca/logo.png' },
+    ],
+  },
+  {
     titulo: 'Tienda',
     campos: [
       { clave: 'tienda.moneda',          label: 'Moneda por defecto', placeholder: 'ARS' },
@@ -104,6 +110,17 @@ export default function AjustesPage() {
                     placeholder={campo.placeholder}
                     onChange={(e) => handleChange(campo.clave, e.target.value)}
                   />
+                  {campo.clave === 'facturacion.logo_url' && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '8px' }}>
+                      {config[campo.clave] && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={config[campo.clave]} alt="Logo" style={{ height: '32px', maxWidth: '140px', objectFit: 'contain', background: '#fff', borderRadius: '2px', padding: '4px' }} />
+                      )}
+                      <a href="/admin/medios" style={{ fontSize: '10px', color: S.muted2, textDecoration: 'underline' }}>
+                        Subir imagen en Medios → carpeta &quot;marca&quot;
+                      </a>
+                    </div>
+                  )}
                 </div>
               ))}
 

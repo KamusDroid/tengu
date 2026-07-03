@@ -18,6 +18,7 @@ type Factura = {
   descripcion: string | null
   moneda: string
   tasaIva: number
+  descuento: number
   venceEn: string
   estado: EstadoFactura
   notas: string | null
@@ -25,21 +26,25 @@ type Factura = {
 }
 
 type ItemRow = { descripcion: string; cantidad: string; precio: string }
+type ProductoRow = { id: string; nombre: string; precioCents: number; moneda: string }
 
 export function EditarFacturaClient({
   factura,
   items: initialItems,
   clientes,
+  productos,
 }: {
   factura: Factura
   items: Array<{ descripcion: string; cantidad: number; precio: number }>
   clientes: Array<{ id: string; nombre: string }>
+  productos: ProductoRow[]
 }) {
   const router = useRouter()
   const [clienteId, setClienteId] = useState(factura.clienteId)
   const [descripcion, setDescripcion] = useState(factura.descripcion ?? '')
   const [moneda, setMoneda] = useState(factura.moneda)
   const [tasaIva, setTasaIva] = useState(String(factura.tasaIva))
+  const [descuento, setDescuento] = useState(factura.descuento ? String(factura.descuento / 100) : '')
   const [venceEn, setVenceEn] = useState(factura.venceEn.slice(0, 10))
   const [estado, setEstado] = useState<EstadoFactura>(factura.estado)
   const [notas, setNotas] = useState(factura.notas ?? '')
@@ -57,6 +62,11 @@ export function EditarFacturaClient({
   }
   function addItem() { setItems((arr) => [...arr, { descripcion: '', cantidad: '1', precio: '' }]) }
   function removeItem(i: number) { setItems((arr) => (arr.length > 1 ? arr.filter((_, idx) => idx !== i) : arr)) }
+  function selectProducto(i: number, productoId: string) {
+    const p = productos.find((prod) => prod.id === productoId)
+    if (!p) return
+    setItems((arr) => arr.map((it, idx) => (idx === i ? { ...it, descripcion: p.nombre, precio: String(p.precioCents / 100) } : it)))
+  }
 
   const subtotalCents = items.reduce((s, it) => {
     const cant = parseFloat(it.cantidad) || 0
@@ -65,7 +75,8 @@ export function EditarFacturaClient({
   }, 0)
   const tasaIvaNum = parseFloat(tasaIva) || 0
   const ivaCents = Math.round(subtotalCents * (tasaIvaNum / 100))
-  const totalCents = subtotalCents + ivaCents
+  const descuentoCents = Math.round((parseFloat(descuento) || 0) * 100)
+  const totalCents = subtotalCents + ivaCents - descuentoCents
 
   function fmtMoney(cents: number) {
     const n = cents / 100
@@ -91,6 +102,7 @@ export function EditarFacturaClient({
           }))),
           subtotalCents,
           tasaIva: tasaIvaNum,
+          descuentoCents,
           venceEn,
           estado,
           notas: notas || null,
@@ -186,12 +198,28 @@ export function EditarFacturaClient({
               const cant = parseFloat(it.cantidad) || 0
               const precio = parseFloat(it.precio) || 0
               return (
-                <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 50px 70px 70px 20px', gap: '4px', padding: '6px 8px', alignItems: 'center', borderBottom: i < items.length - 1 ? `0.5px solid ${S.border}` : 'none' }}>
-                  <input style={{ ...inp, padding: '5px 6px', fontSize: '11px' }} value={it.descripcion} onChange={(e) => itemField(i, 'descripcion', e.target.value)} placeholder="Servicio" />
-                  <input style={{ ...inp, padding: '5px 6px', fontSize: '11px' }} type="number" value={it.cantidad} onChange={(e) => itemField(i, 'cantidad', e.target.value)} />
-                  <input style={{ ...inp, padding: '5px 6px', fontSize: '11px' }} type="number" value={it.precio} onChange={(e) => itemField(i, 'precio', e.target.value)} />
-                  <div style={{ fontSize: '11px', fontFamily: 'monospace', color: S.muted }}>{(cant * precio).toLocaleString('es-AR')}</div>
-                  <button onClick={() => removeItem(i)} style={{ background: 'transparent', border: 'none', color: S.muted2, cursor: 'pointer' }}>✕</button>
+                <div key={i} style={{ padding: '6px 8px', borderBottom: i < items.length - 1 ? `0.5px solid ${S.border}` : 'none' }}>
+                  {productos.length > 0 && (
+                    <select
+                      style={{ ...inp, padding: '5px 6px', fontSize: '11px', marginBottom: '4px' }}
+                      value=""
+                      onChange={(e) => { if (e.target.value) selectProducto(i, e.target.value) }}
+                    >
+                      <option value="">Producto existente (opcional)...</option>
+                      {productos.map((p) => (
+                        <option key={p.id} value={p.id}>
+                          {p.nombre} — {p.moneda === 'USD' ? 'U$S ' : '$ '}{(p.precioCents / 100).toLocaleString('es-AR')}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 50px 70px 70px 20px', gap: '4px', alignItems: 'center' }}>
+                    <input style={{ ...inp, padding: '5px 6px', fontSize: '11px' }} value={it.descripcion} onChange={(e) => itemField(i, 'descripcion', e.target.value)} placeholder="Servicio" />
+                    <input style={{ ...inp, padding: '5px 6px', fontSize: '11px' }} type="number" value={it.cantidad} onChange={(e) => itemField(i, 'cantidad', e.target.value)} />
+                    <input style={{ ...inp, padding: '5px 6px', fontSize: '11px' }} type="number" value={it.precio} onChange={(e) => itemField(i, 'precio', e.target.value)} />
+                    <div style={{ fontSize: '11px', fontFamily: 'monospace', color: S.muted }}>{(cant * precio).toLocaleString('es-AR')}</div>
+                    <button onClick={() => removeItem(i)} style={{ background: 'transparent', border: 'none', color: S.muted2, cursor: 'pointer' }}>✕</button>
+                  </div>
                 </div>
               )
             })}
@@ -206,6 +234,16 @@ export function EditarFacturaClient({
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', color: S.muted }}>
               <span>IVA ({tasaIvaNum}%)</span><span style={{ fontFamily: 'monospace' }}>{fmtMoney(ivaCents)}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: S.muted }}>
+              <span>Descuento</span>
+              <input
+                style={{ ...inp, width: '90px', padding: '4px 6px', fontSize: '11px', fontFamily: 'monospace', textAlign: 'right' }}
+                type="number"
+                value={descuento}
+                onChange={(e) => setDescuento(e.target.value)}
+                placeholder="0"
+              />
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', color: S.text, fontWeight: 500, fontSize: '13px', marginTop: '4px' }}>
               <span>Total</span><span style={{ fontFamily: 'monospace' }}>{fmtMoney(totalCents)}</span>
