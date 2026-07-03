@@ -19,7 +19,7 @@ const CreateSchema = z.object({
 
 const UpdateSchema = z.object({
   id: z.string().min(1),
-  estado: z.enum(['draft', 'sent', 'paid', 'overdue']).optional(),
+  estado: z.enum(['draft', 'sent', 'paid', 'overdue', 'cancelled']).optional(),
   descripcion: z.string().optional().nullable(),
   items: z.string().optional().nullable(),
   subtotalCents: z.number().int().nonnegative().optional(),
@@ -118,4 +118,16 @@ export async function PUT(req: Request) {
   })
 
   return NextResponse.json(factura)
+}
+
+export async function DELETE(req: Request) {
+  const user = await getUserFromCookie()
+  if (!isAdmin(user)) return NextResponse.json({ error: 'No autorizado' }, { status: 403 })
+
+  const { searchParams } = new URL(req.url)
+  const id = searchParams.get('id')
+  if (!id) return NextResponse.json({ error: 'Falta id' }, { status: 400 })
+
+  await crmDb.invoice.delete({ where: { id } })
+  return NextResponse.json({ ok: true })
 }

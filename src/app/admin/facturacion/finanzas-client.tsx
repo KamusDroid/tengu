@@ -285,6 +285,12 @@ export function FinanzasClient({
     router.refresh()
   }
 
+  async function eliminarFactura(f: FacturaRow) {
+    if (!confirm(`¿Eliminar definitivamente la factura ${f.numero}? Esta acción no se puede deshacer.`)) return
+    await fetch(`/api/admin/facturas?id=${f.id}`, { method: 'DELETE' })
+    router.refresh()
+  }
+
   async function guardarCliente() {
     if (!clienteForm.nombre.trim()) { setError('El nombre es obligatorio'); return }
     setLoading(true); setError('')
@@ -454,7 +460,9 @@ export function FinanzasClient({
                           <option value="sent">Enviada</option>
                           <option value="paid">Pagada</option>
                           <option value="overdue">Vencida</option>
+                          <option value="cancelled">Cancelada</option>
                         </select>
+                        <button onClick={() => eliminarFactura(f)} style={{ background: 'transparent', border: `0.5px solid ${S.border}`, color: S.error, padding: '4px 10px', fontSize: '11px', borderRadius: '2px', cursor: 'pointer' }}>Eliminar</button>
                       </div>
                     </td>
                   </tr>
