@@ -14,6 +14,7 @@ const NAV_ITEMS = [
     { href: '/admin/pedidos', label: 'Pedidos', icon: '⊕' },
     { href: '/admin/stock', label: 'Stock', icon: '⊟' },
     { href: '/admin/cupones', label: 'Cupones', icon: '◇' },
+    { href: '/admin/facturacion', label: 'Facturación', icon: '◎' },
   ]},
   { group: 'Clientes', items: [
     { href: '/admin/usuarios', label: 'Usuarios', icon: '⊙' },

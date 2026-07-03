@@ -176,6 +176,47 @@ exports.Prisma.ConfiguracionSitioScalarFieldEnum = {
   valor: 'valor'
 };
 
+exports.Prisma.BillingClientScalarFieldEnum = {
+  id: 'id',
+  nombre: 'nombre',
+  email: 'email',
+  telefono: 'telefono',
+  industria: 'industria',
+  cuit: 'cuit',
+  direccion: 'direccion',
+  datosPago: 'datosPago',
+  valorMensual: 'valorMensual',
+  moneda: 'moneda',
+  inicioContrato: 'inicioContrato',
+  renovacionContrato: 'renovacionContrato',
+  estado: 'estado',
+  notas: 'notas',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.InvoiceScalarFieldEnum = {
+  id: 'id',
+  numero: 'numero',
+  clienteId: 'clienteId',
+  descripcion: 'descripcion',
+  items: 'items',
+  subtotal: 'subtotal',
+  tasaIva: 'tasaIva',
+  montoIva: 'montoIva',
+  descuento: 'descuento',
+  total: 'total',
+  moneda: 'moneda',
+  estado: 'estado',
+  emitidaEn: 'emitidaEn',
+  venceEn: 'venceEn',
+  pagadaEn: 'pagadaEn',
+  notas: 'notas',
+  datosPago: 'datosPago',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -197,7 +238,9 @@ exports.Prisma.ModelName = {
   BlogPost: 'BlogPost',
   Taller: 'Taller',
   Inscripcion: 'Inscripcion',
-  ConfiguracionSitio: 'ConfiguracionSitio'
+  ConfiguracionSitio: 'ConfiguracionSitio',
+  BillingClient: 'BillingClient',
+  Invoice: 'Invoice'
 };
 
 /**
