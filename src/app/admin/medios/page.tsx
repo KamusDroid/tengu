@@ -60,6 +60,10 @@ export default function MediosPage() {
     setTimeout(() => setCopied(''), 2000)
   }
 
+  function isAudio(nombre: string) {
+    return /\.(mp3|ogg|wav|webm)$/i.test(nombre)
+  }
+
   function isImage(nombre: string) {
     return /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(nombre)
   }
@@ -127,7 +131,7 @@ export default function MediosPage() {
                 <img src={a.url} alt={a.name} style={{ width: '100%', height: '110px', objectFit: 'cover', display: 'block' }} />
               ) : (
                 <div style={{ width: '100%', height: '110px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(240,237,230,0.03)', fontSize: '28px' }}>
-                  📄
+                  {isAudio(a.name) ? '🎵' : '📄'}
                 </div>
               )}
               <div style={{ padding: '8px' }}>

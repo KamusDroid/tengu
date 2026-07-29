@@ -13,6 +13,11 @@ const MIME: Record<string, string> = {
   '.svg': 'image/svg+xml',
   '.mp4': 'video/mp4',
   '.pdf': 'application/pdf',
+  '.mp3': 'audio/mpeg',
+  '.m4a': 'audio/mp4',
+  '.ogg': 'audio/ogg',
+  '.wav': 'audio/wav',
+  '.webm': 'audio/webm',
 }
 
 export async function GET(_req: Request, { params }: { params: Promise<{ path: string[] }> }) {

@@ -4,8 +4,13 @@ import fs from 'fs'
 import path from 'path'
 
 const CARPETAS = ['productos', 'blog', 'academia', 'marca', 'equipo'] as const
-const MAX_SIZE = 5 * 1024 * 1024
-const ALLOWED_MIME = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml', 'video/mp4', 'application/pdf']
+const MAX_SIZE = 15 * 1024 * 1024
+const ALLOWED_MIME = [
+  'image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml',
+  'video/mp4', 'application/pdf',
+  'audio/mpeg', 'audio/mp3', 'audio/ogg', 'audio/wav', 'audio/x-wav', 'audio/webm',
+  'audio/mp4', 'audio/x-m4a', 'audio/aac',
+]
 
 function uploadsDir(folder: string) {
   return path.join(process.cwd(), 'public', 'uploads', folder)

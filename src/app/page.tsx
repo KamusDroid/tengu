@@ -3,6 +3,10 @@ import MetricasBar from '@/components/MetricasBar'
 import Servicios from '@/components/Servicios'
 import Proyectos from '@/components/Proyectos'
 import Sobre from '@/components/Sobre'
+import MusicPlayer from '@/components/MusicPlayer'
+import { crmDb } from '@/lib/dbCrm'
+
+export const dynamic = 'force-dynamic'
 
 const GlowDivider = () => (
   <div
@@ -15,7 +19,10 @@ const GlowDivider = () => (
   />
 )
 
-export default function Home() {
+export default async function Home() {
+  const musicaConfig = await crmDb.configuracionSitio.findUnique({ where: { clave: 'hero.musica_url' } })
+  const musicaUrl = musicaConfig?.valor || null
+
   return (
     <main className="flex flex-col" style={{ background: '#050507' }}>
       <Hero />
@@ -27,6 +34,7 @@ export default function Home() {
       <Proyectos />
       <GlowDivider />
       <Sobre />
+      {musicaUrl && <MusicPlayer src={musicaUrl} />}
     </main>
   )
 }

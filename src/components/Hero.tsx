@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import { useI18n } from '@/lib/i18n'
+import AudioRing from '@/components/AudioRing'
 
 export default function Hero() {
   const { t } = useI18n()
@@ -68,7 +69,7 @@ export default function Hero() {
         }}
       />
 
-      {/* CAPA 3 — Tomoe girando */}
+      {/* CAPA 3 — Tomoe girando + aro de luz neon separado, reacciona a --audio-level (seteado por MusicPlayer) */}
       <div
         style={{
           position: 'absolute',
@@ -80,6 +81,8 @@ export default function Hero() {
           zIndex: 3,
         }}
       >
+        {/* Aro neon ondulante, separado del tomoe por espacio, se deforma con el audio */}
+        <AudioRing />
         <Image
           src="/tomoe.png"
           alt=""
@@ -115,13 +118,13 @@ export default function Hero() {
             marginBottom: '20px',
           }}
         >
-          <div style={{ width: '28px', height: '1px', background: '#c0392b', flexShrink: 0 }} />
+          <div style={{ width: '28px', height: '1px', background: 'rgba(240,237,230,0.55)', flexShrink: 0 }} />
           <span
             style={{
               fontSize: '11px',
               textTransform: 'uppercase',
               letterSpacing: '3px',
-              color: 'rgba(192,57,43,0.7)',
+              color: 'rgba(240,237,230,0.55)',
             }}
           >
             {heroContent.kicker}

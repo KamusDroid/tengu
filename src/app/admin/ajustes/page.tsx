@@ -25,6 +25,7 @@ const SECCIONES: { titulo: string; campos: Campo[] }[] = [
     campos: [
       { clave: 'hero.video_url',   label: 'Hero — URL del video de fondo', placeholder: '/videos/hero-bg.mp4' },
       { clave: 'hero.imagen_url',  label: 'Hero — URL imagen (fallback)',  placeholder: '/uploads/marca/hero.jpg' },
+      { clave: 'hero.musica_url',  label: 'Música de fondo (URL audio, opcional)', placeholder: '/uploads/marca/musica.mp3' },
     ],
   },
   {
