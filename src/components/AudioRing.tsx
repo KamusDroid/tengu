@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { subscribeAudioFrame } from '@/lib/audioReactive'
+import { subscribeAudioFrame, pulseLevel, PULSE_GAIN, PULSE_AMOUNT } from '@/lib/audioReactive'
 
 const CONTAINER = 476
 const CX = CONTAINER / 2
@@ -42,14 +42,27 @@ function buildWavyRingPath(freq: ArrayLike<number>, gain: number): string {
 }
 
 export default function AudioRing() {
+  const svgRef = useRef<SVGSVGElement>(null)
   const outerRef = useRef<SVGPathElement>(null)
   const innerRef = useRef<SVGPathElement>(null)
 
   useEffect(() => {
+    // Estado de reposo: se calcula solo en el cliente, después del montaje,
+    // para no arrastrar diferencias de precisión de punto flotante (Math.cos/sin)
+    // entre el render del servidor y el del navegador (evita hydration mismatch).
+    const restD = buildWavyRingPath(new Uint8Array(REST_BINS), GAIN)
+    outerRef.current?.setAttribute('d', restD)
+    innerRef.current?.setAttribute('d', restD)
+
     return subscribeAudioFrame((data) => {
       const d = buildWavyRingPath(data, GAIN)
       outerRef.current?.setAttribute('d', d)
       innerRef.current?.setAttribute('d', d)
+
+      if (svgRef.current) {
+        const pulse = pulseLevel(data, PULSE_GAIN)
+        svgRef.current.style.transform = `scale(${1 + pulse * PULSE_AMOUNT})`
+      }
 
       let sum = 0
       for (let i = 0; i < data.length; i++) sum += data[i]
@@ -68,22 +81,22 @@ export default function AudioRing() {
     })
   }, [])
 
-  const initialD = buildWavyRingPath(new Uint8Array(REST_BINS), GAIN)
-
   return (
     <svg
+      ref={svgRef}
       viewBox={`0 0 ${CONTAINER} ${CONTAINER}`}
       style={{
         position: 'absolute',
         inset: `-${(CONTAINER - 420) / 2}px`,
         pointerEvents: 'none',
         overflow: 'visible',
+        transformOrigin: 'center center',
+        transition: 'transform 0.08s ease-out',
       }}
     >
       {/* Halo exterior, muy difuso — la "luz irradiando" */}
       <path
         ref={outerRef}
-        d={initialD}
         fill="none"
         stroke="#ff2d3d"
         strokeWidth="8"
@@ -92,7 +105,6 @@ export default function AudioRing() {
       {/* Núcleo interior, más definido pero igual difuminado */}
       <path
         ref={innerRef}
-        d={initialD}
         fill="none"
         stroke="#ff1f35"
         strokeWidth="3"

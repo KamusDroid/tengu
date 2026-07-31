@@ -1,12 +1,24 @@
 'use client'
 
 import Image from 'next/image'
+import { useEffect, useRef } from 'react'
 import { useI18n } from '@/lib/i18n'
 import AudioRing from '@/components/AudioRing'
+import { subscribeAudioFrame, pulseLevel, PULSE_GAIN, PULSE_AMOUNT } from '@/lib/audioReactive'
 
 export default function Hero() {
   const { t } = useI18n()
   const heroContent = t.heroContent
+  const pulseRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    return subscribeAudioFrame((data) => {
+      const level = pulseLevel(data, PULSE_GAIN)
+      if (pulseRef.current) {
+        pulseRef.current.style.transform = `scale(${1 + level * PULSE_AMOUNT})`
+      }
+    })
+  }, [])
 
   return (
     <section
@@ -83,21 +95,33 @@ export default function Hero() {
       >
         {/* Aro neon ondulante, separado del tomoe por espacio, se deforma con el audio */}
         <AudioRing />
-        <Image
-          src="/tomoe.png"
-          alt=""
-          fill
-          sizes="420px"
+        {/* Wrapper que pulsa (escala uniforme) con el audio, separado del giro para no deformar la imagen */}
+        <div
+          ref={pulseRef}
           style={{
-            objectFit: 'contain',
-            animation: 'spin 18s linear infinite',
+            position: 'absolute',
+            inset: 0,
             transformOrigin: 'center center',
-            filter:
-              'drop-shadow(0 0 28px rgba(192,57,43,0.6)) drop-shadow(0 0 70px rgba(192,57,43,0.22))',
-            opacity: 0.85,
+            transition: 'transform 0.08s ease-out',
           }}
-          aria-hidden="true"
-        />
+        >
+          <Image
+            src="/tomoe.png"
+            alt=""
+            fill
+            priority
+            sizes="420px"
+            style={{
+              objectFit: 'contain',
+              animation: 'spin 18s linear infinite',
+              transformOrigin: 'center center',
+              filter:
+                'drop-shadow(0 0 28px rgba(192,57,43,0.6)) drop-shadow(0 0 70px rgba(192,57,43,0.22))',
+              opacity: 0.85,
+            }}
+            aria-hidden="true"
+          />
+        </div>
       </div>
 
       {/* CAPA 4 — Contenido */}
