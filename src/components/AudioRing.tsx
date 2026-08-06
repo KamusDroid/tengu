@@ -45,18 +45,20 @@ export default function AudioRing() {
   const svgRef = useRef<SVGSVGElement>(null)
   const outerRef = useRef<SVGPathElement>(null)
   const innerRef = useRef<SVGPathElement>(null)
+  const isMobileRef = useRef(false)
 
   useEffect(() => {
+    isMobileRef.current = window.matchMedia('(max-width: 768px)').matches
+
     // Estado de reposo: se calcula solo en el cliente, después del montaje,
     // para no arrastrar diferencias de precisión de punto flotante (Math.cos/sin)
     // entre el render del servidor y el del navegador (evita hydration mismatch).
     const restD = buildWavyRingPath(new Uint8Array(REST_BINS), GAIN)
-    outerRef.current?.setAttribute('d', restD)
+    if (!isMobileRef.current) outerRef.current?.setAttribute('d', restD)
     innerRef.current?.setAttribute('d', restD)
 
     return subscribeAudioFrame((data) => {
       const d = buildWavyRingPath(data, GAIN)
-      outerRef.current?.setAttribute('d', d)
       innerRef.current?.setAttribute('d', d)
 
       if (svgRef.current) {
@@ -68,15 +70,19 @@ export default function AudioRing() {
       for (let i = 0; i < data.length; i++) sum += data[i]
       const level = boost(sum / data.length / 255, GAIN)
 
-      if (outerRef.current) {
-        outerRef.current.style.filter = `blur(${18 + level * 26}px)`
-        outerRef.current.style.opacity = String(0.24 + level * 0.4)
-        outerRef.current.style.strokeWidth = String(8 + level * 15)
-      }
       if (innerRef.current) {
         innerRef.current.style.filter = `blur(${6 + level * 9}px)`
         innerRef.current.style.opacity = String(0.34 + level * 0.42)
         innerRef.current.style.strokeWidth = String(3 + level * 5)
+      }
+
+      // Capa exterior (más blur, más cara de renderizar): se salta por completo en mobile.
+      if (isMobileRef.current) return
+      outerRef.current?.setAttribute('d', d)
+      if (outerRef.current) {
+        outerRef.current.style.filter = `blur(${18 + level * 26}px)`
+        outerRef.current.style.opacity = String(0.24 + level * 0.4)
+        outerRef.current.style.strokeWidth = String(8 + level * 15)
       }
     })
   }, [])
@@ -94,9 +100,11 @@ export default function AudioRing() {
         transition: 'transform 0.08s ease-out',
       }}
     >
-      {/* Halo exterior, muy difuso — la "luz irradiando" */}
+      <style>{`@media (max-width: 768px) { .audio-ring-outer { display: none !important; } }`}</style>
+      {/* Halo exterior, muy difuso — la "luz irradiando". Oculto en mobile (costoso de renderizar). */}
       <path
         ref={outerRef}
+        className="audio-ring-outer"
         fill="none"
         stroke="#ff2d3d"
         strokeWidth="8"

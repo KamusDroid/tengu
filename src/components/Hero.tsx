@@ -31,7 +31,23 @@ export default function Hero() {
         overflow: 'hidden',
       }}
     >
-      {/* CAPA 0 — Video de fondo */}
+      {/* CAPA -1 — Fondo base: oscuro con glows rojos tenues. Se ve solo (sin video) en mobile. */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          zIndex: 0,
+          background: `
+            radial-gradient(ellipse 55% 45% at 25% 20%, rgba(230,57,70,0.10) 0%, transparent 60%),
+            radial-gradient(ellipse 50% 40% at 80% 75%, rgba(192,57,43,0.09) 0%, transparent 60%),
+            radial-gradient(ellipse 40% 35% at 60% 15%, rgba(230,57,70,0.06) 0%, transparent 55%),
+            #050507
+          `,
+        }}
+      />
+
+      {/* CAPA 0 — Video de fondo (solo desktop: el <source> con media query hace que en mobile
+          el navegador ni siquiera lo descargue/decodifique, evitando el lag) */}
       <video
         autoPlay
         muted
@@ -47,7 +63,7 @@ export default function Hero() {
           opacity: 0.99,
         }}
       >
-        <source src="/videos/hero-bg.mp4" type="video/mp4" />
+        <source media="(min-width: 769px)" src="/videos/hero-bg.mp4" type="video/mp4" />
       </video>
 
       {/* CAPA 1 — Overlay oscuro + glow radial sobre el video */}
